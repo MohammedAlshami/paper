@@ -2,9 +2,11 @@
 
 import * as React from 'react';
 import { Pause, Play, SkipBack, SkipForward } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { StatusMark, type Mark } from '@/components/internal/status-mark';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/internal/card';
-import { StatusMark, type Mark } from '@/components/internal/status';
 import type { Run, RunStep } from './types';
 
 const markFor: Record<RunStep['status'], Mark> = {
@@ -18,7 +20,7 @@ const markFor: Record<RunStep['status'], Mark> = {
 
 const SPEEDS = [1, 2, 4] as const;
 
-/** ReplayScrubber — scrub through a finished run step by step. Time travel, greyscale. */
+/** ReplayScrubber — scrub through a finished run, step by step. */
 export function ReplayScrubber({
   run,
   index,
@@ -39,39 +41,36 @@ export function ReplayScrubber({
   className?: string;
 }) {
   const total = run.steps.length;
-  const step = run.steps[Math.min(index, total - 1)];
+  const step = run.steps[Math.min(index, Math.max(0, total - 1))];
 
   return (
-    <Card className={cn('p-4', className)}>
-      <div className="flex flex-wrap items-center gap-4">
+    <Card className={cn('py-0', className)}>
+      <CardContent className="flex flex-wrap items-center gap-4 py-4">
         <div className="flex items-center gap-1">
-          <button
-            type="button"
+          <Button
+            size="icon"
+            variant="ghost"
             aria-label="Previous step"
+            disabled={index <= 0}
             onClick={() => onChange(Math.max(0, index - 1))}
-            className="grid size-8 place-items-center rounded-paper text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <SkipBack className="size-4" />
-          </button>
-          <button
-            type="button"
-            aria-label={playing ? 'Pause replay' : 'Play replay'}
-            onClick={onTogglePlay}
-            className="grid size-9 place-items-center rounded-paper bg-primary text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            {playing ? <Pause className="size-4" /> : <Play className="size-4" />}
-          </button>
-          <button
-            type="button"
+            <SkipBack />
+          </Button>
+          <Button size="icon" aria-label={playing ? 'Pause replay' : 'Play replay'} onClick={onTogglePlay}>
+            {playing ? <Pause /> : <Play />}
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
             aria-label="Next step"
+            disabled={index >= total - 1}
             onClick={() => onChange(Math.min(total - 1, index + 1))}
-            className="grid size-8 place-items-center rounded-paper text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
-            <SkipForward className="size-4" />
-          </button>
+            <SkipForward />
+          </Button>
         </div>
 
-        <div className="min-w-[12rem] flex-1">
+        <div className="min-w-48 flex-1 space-y-2">
           <input
             type="range"
             min={0}
@@ -80,12 +79,12 @@ export function ReplayScrubber({
             value={index}
             onChange={(event) => onChange(Number(event.target.value))}
             aria-label="Replay position"
-            className="h-1 w-full accent-primary"
+            className="h-1 w-full cursor-pointer accent-foreground"
           />
-          <div className="mt-2 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <StatusMark state={markFor[step.status]} />
-            <span className="truncate text-sm font-medium text-foreground">{step.name}</span>
-            <span className="tabular ml-auto shrink-0 font-mono text-[11px] text-faint">
+            <span className="truncate text-sm font-medium">{step.name}</span>
+            <span className="ml-auto shrink-0 font-mono text-xs text-muted-foreground tabular-nums">
               {index + 1} / {total}
               {step.startedAt ? ` · ${step.startedAt}` : ''}
             </span>
@@ -94,21 +93,14 @@ export function ReplayScrubber({
 
         <div className="flex items-center gap-1">
           {SPEEDS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => onSpeedChange?.(value)}
-              aria-pressed={speed === value}
-              className={cn(
-                'rounded-paper px-2 py-1 font-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors',
-                speed === value ? 'bg-primary text-primary-foreground' : 'text-faint hover:bg-muted hover:text-foreground',
-              )}
-            >
-              {value}×
+            <button key={value} type="button" onClick={() => onSpeedChange?.(value)} aria-pressed={speed === value}>
+              <Badge variant={speed === value ? 'default' : 'outline'} className="font-mono">
+                {value}×
+              </Badge>
             </button>
           ))}
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 }

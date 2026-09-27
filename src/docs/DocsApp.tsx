@@ -1,14 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { Check, Copy, ExternalLink } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/internal/badge';
-import { Button } from '@/components/internal/button';
-import { Card } from '@/components/internal/card';
-import { Eyebrow } from '@/components/internal/eyebrow';
-import { Rule } from '@/components/internal/rule';
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from '@/components/internal/tabs';
 import { ApprovalStep } from '@/components/agent-ops/approval-step';
 import { BranchCompare } from '@/components/agent-ops/branch-compare';
 import { EventStream } from '@/components/agent-ops/event-stream';
@@ -19,7 +11,24 @@ import { RunMetrics } from '@/components/agent-ops/run-metrics';
 import { RunTimeline } from '@/components/agent-ops/run-timeline';
 import { RunsTable } from '@/components/agent-ops/runs-table';
 import { StepDetail } from '@/components/agent-ops/step-detail';
-import { COMPONENTS, PLANNED, getComponent, type ComponentEntry } from './registry';
+import {
+  ApiTable,
+  Code,
+  CodeBlock,
+  Demo,
+  GhostButton,
+  InstallBlock,
+  Link,
+  MdH1,
+  MdH2,
+  MdH3,
+  MdLi,
+  MdP,
+  MdUl,
+  Subtitle,
+  SubtitleLink,
+} from './md';
+import { COMPONENTS, getComponent, type ComponentEntry } from './registry';
 import {
   APPROVAL_EMAIL,
   EVENTS,
@@ -34,340 +43,638 @@ import {
   TREND,
 } from './previews';
 
-const START_PAGES = [
-  { id: 'introduction', label: 'Introduction' },
-  { id: 'installation', label: 'Installation' },
-  { id: 'console', label: 'Operations console' },
+/* ============================================================================
+   navigation
+   ========================================================================== */
+
+type NavItem = { id: string; label: string; href: string; external?: boolean };
+type NavGroup = { heading: string; items: NavItem[] };
+
+const COMPONENT_ITEMS: NavItem[] = COMPONENTS.map((entry) => ({
+  id: entry.id,
+  label: entry.name,
+  href: `#/components/${entry.id}`,
+}));
+
+const NAV: NavGroup[] = [
+  {
+    heading: 'Overview',
+    items: [
+      { id: 'quick-start', label: 'Quick start', href: '#/quick-start' },
+      { id: 'installation', label: 'Installation', href: '#/installation' },
+      { id: 'console', label: 'Operations console', href: '#/console' },
+    ],
+  },
+  {
+    heading: 'Handbook',
+    items: [
+      { id: 'styling', label: 'Styling', href: '#/styling' },
+      { id: 'composition', label: 'Composition', href: '#/composition' },
+      { id: 'typescript', label: 'TypeScript', href: '#/typescript' },
+    ],
+  },
+  { heading: 'Components', items: COMPONENT_ITEMS },
 ];
 
-const ON_THIS_PAGE = [
-  { id: 'installation', label: 'Installation' },
-  { id: 'usage', label: 'Usage' },
-  { id: 'examples', label: 'Examples' },
-  { id: 'api', label: 'API reference' },
-];
+const REPO = 'https://github.com/MohammedAlshami/paper';
+
+/* ============================================================================
+   routing
+   ========================================================================== */
 
 function useRoute() {
   const read = () =>
-    typeof window === 'undefined' ? 'introduction' : window.location.hash.replace(/^#\/?/, '') || 'introduction';
+    typeof window === 'undefined' ? 'quick-start' : window.location.hash.replace(/^#\/?/, '') || 'quick-start';
   const [route, setRoute] = React.useState(read);
 
   React.useEffect(() => {
-    const onChange = () => {
+    const onHashChange = () => {
       setRoute(read());
       window.scrollTo({ top: 0 });
     };
-    window.addEventListener('hashchange', onChange);
-    return () => window.removeEventListener('hashchange', onChange);
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
   return route;
 }
 
-function CodeBlock({ code, className }: { code: string; className?: string }) {
-  const [copied, setCopied] = React.useState(false);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1400);
-    } catch {
-      /* clipboard unavailable */
-    }
-  };
-  return (
-    <div className={cn('relative', className)}>
-      <pre className="overflow-x-auto rounded-paper border border-border bg-muted p-4 pr-14 font-mono text-[12.5px] leading-relaxed text-foreground">
-        {code}
-      </pre>
-      <button
-        type="button"
-        onClick={copy}
-        aria-label="Copy code"
-        className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-paper px-2 py-1 text-[11px] uppercase tracking-wider text-faint transition-colors hover:text-foreground"
-      >
-        {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
-        {copied ? 'Copied' : 'Copy'}
-      </button>
-    </div>
-  );
+function useActiveAnchor() {
+  const [active, setActive] = React.useState('');
+  React.useEffect(() => {
+    const ids = Array.from(document.querySelectorAll<HTMLElement>('.QuickNavContent [id]')).map((el) => el.id);
+    const elements = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => Boolean(el));
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]?.target.id) setActive(visible[0].target.id);
+      },
+      { rootMargin: '-72px 0px -70% 0px' },
+    );
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+  return active;
 }
 
-function Demo({ children, className }: { children: React.ReactNode; className?: string }) {
+/* ============================================================================
+   chrome
+   ========================================================================== */
+
+function Header({ onSearch }: { onSearch: () => void }) {
   return (
-    <div className={cn('rounded-paper-lg border border-border bg-background p-4 sm:p-6', className)}>{children}</div>
-  );
-}
-
-function PageSection({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
-  return (
-    <>
-      <Rule className="mt-12" />
-      <section id={id} className="scroll-mt-24 py-9">
-        <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">{title}</h2>
-        <div className="mt-5">{children}</div>
-      </section>
-    </>
-  );
-}
-
-function ManualInstall({ entry }: { entry?: ComponentEntry }) {
-  return (
-    <div className="space-y-4">
-      <ol className="space-y-3 text-sm leading-relaxed text-muted-foreground">
-        <li>
-          1. Copy{' '}
-          <code className="font-mono text-[12.5px] text-foreground">
-            src/{entry ? entry.file : 'components/agent-ops/…'}
-          </code>{' '}
-          into your project.
-        </li>
-        <li>
-          2. Install what it imports:{' '}
-          <span className="font-mono text-[12.5px] text-foreground">
-            {entry ? entry.deps.join(', ') : 'lucide-react, internal/*'}
-          </span>
-          .
-        </li>
-        <li>
-          3. Keep the token block from <code className="font-mono text-[12.5px] text-foreground">styles/app.css</code> — the
-          components read <code className="font-mono text-[12.5px] text-foreground">--background</code>,{' '}
-          <code className="font-mono text-[12.5px] text-foreground">--card</code>,{' '}
-          <code className="font-mono text-[12.5px] text-foreground">--border</code> and friends.
-        </li>
-      </ol>
-      <p className="rounded-paper border border-border bg-card p-4 text-sm text-muted-foreground">
-        A shadcn-compatible registry is planned, so this becomes{' '}
-        <code className="font-mono text-[12.5px] text-foreground">npx shadcn@latest add …</code> with no manual copying.
-      </p>
-    </div>
-  );
-}
-
-function ApiTables({ entry }: { entry: ComponentEntry }) {
-  return (
-    <div className="space-y-8">
-      {entry.api.map((group) => (
-        <div key={group.title}>
-          <h3 className="font-mono text-[13px] text-foreground">{group.title}</h3>
-          <div className="mt-3 overflow-x-auto rounded-paper border border-border bg-card">
-            <table className="w-full min-w-[36rem] text-left text-sm">
-              <thead className="border-b border-border bg-muted text-[11px] uppercase tracking-wider text-faint">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Prop</th>
-                  <th className="px-4 py-2 font-medium">Type</th>
-                  <th className="px-4 py-2 font-medium">Default</th>
-                  <th className="px-4 py-2 font-medium">Description</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-solid divide-border">
-                {group.rows.map((row) => (
-                  <tr key={row.prop}>
-                    <td className="px-4 py-2.5 font-mono text-[12.5px] text-foreground">{row.prop}</td>
-                    <td className="px-4 py-2.5 font-mono text-[12px] text-muted-foreground">{row.type}</td>
-                    <td className="px-4 py-2.5 font-mono text-[12px] text-faint">{row.default ?? '—'}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{row.description}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ComponentPage({ entry }: { entry: ComponentEntry }) {
-  const examples = EXAMPLES[entry.id] ?? [];
-  return (
-    <article className="min-w-0 flex-1 pb-32">
-      <Eyebrow className="mb-3">{entry.category}</Eyebrow>
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-4xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-5xl">
-          {entry.name}
-        </h1>
-        {entry.status === 'new' ? <Badge tone="solid">new</Badge> : null}
-      </div>
-      <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{entry.tagline}</p>
-      <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">{entry.description}</p>
-
-      <div className="mt-9">
-        <Tabs defaultValue="preview">
-          <TabsList>
-            <TabsTab value="preview">Preview</TabsTab>
-            <TabsTab value="code">Code</TabsTab>
-            <TabsIndicator />
-          </TabsList>
-          <TabsPanel value="preview">
-            <Demo>{PREVIEWS[entry.id]}</Demo>
-          </TabsPanel>
-          <TabsPanel value="code">
-            <CodeBlock code={entry.usage} />
-          </TabsPanel>
-        </Tabs>
-      </div>
-
-      <PageSection id="installation" title="Installation">
-        <ManualInstall entry={entry} />
-      </PageSection>
-
-      <PageSection id="usage" title="Usage">
-        <CodeBlock code={entry.usage} />
-      </PageSection>
-
-      <PageSection id="examples" title="Examples">
-        <div className="space-y-10">
-          {examples.map((example, index) => (
-            <div key={example.label}>
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <Badge>{example.label}</Badge>
-                {entry.examples[index]?.code ? (
-                  <code className="font-mono text-[11.5px] text-faint">{entry.examples[index].code}</code>
-                ) : null}
-              </div>
-              <Demo>{example.node}</Demo>
-            </div>
-          ))}
-        </div>
-      </PageSection>
-
-      <PageSection id="api" title="API reference">
-        <ApiTables entry={entry} />
-      </PageSection>
-    </article>
-  );
-}
-
-function IntroductionPage() {
-  return (
-    <article className="min-w-0 flex-1 pb-32">
-      <Eyebrow className="mb-4">Copy-paste components · MIT</Eyebrow>
-      <h1 className="max-w-3xl font-display text-5xl font-extrabold leading-[0.92] tracking-tight text-foreground sm:text-6xl">
-        The agent-ops layer, as components.
-      </h1>
-      <p className="mt-7 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-        Chat shells are commodity. Paper ships the surfaces that make a running AI workflow <em>observable</em>,{' '}
-        <em>interruptible</em> and <em>affordable</em> — running a workflow, watching each step, replaying it, forking it
-        from a step, and approving the side effect before it happens. Ten components, no runtime package.
-      </p>
-
-      <div className="mt-10 flex flex-wrap items-center gap-3">
-        <Button onClick={() => (window.location.hash = '#/console')}>Open the console</Button>
-        <Button variant="outline" onClick={() => (window.location.hash = '#/components/run-timeline')}>
-          Start with RunTimeline
-        </Button>
-      </div>
-
-      <Rule className="my-12" />
-
-      <div className="grid gap-4">
-        {COMPONENTS.map((entry) => (
-          <button
-            key={entry.id}
-            type="button"
-            onClick={() => (window.location.hash = `#/components/${entry.id}`)}
-            className="flex items-start gap-5 rounded-paper-lg border border-border bg-card p-5 text-left shadow-card transition-colors hover:border-border-strong"
-          >
-            <span className="min-w-0">
-              <span className="flex flex-wrap items-center gap-2">
-                <span className="font-display text-lg font-bold tracking-tight text-foreground">{entry.name}</span>
-                <Badge tone="muted">{entry.category}</Badge>
-                {entry.status === 'new' ? <Badge tone="solid">new</Badge> : null}
-              </span>
-              <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{entry.tagline}</span>
+    <header className="Header">
+      <div className="HeaderInner">
+        <a className="SkipNav" href="#main-content">
+          Skip to contents
+        </a>
+        <a className="HeaderLogoLink" aria-label="Go to the homepage" href="#/quick-start">
+          <svg width="20" height="18" viewBox="0 0 20 18" fill="currentColor" aria-hidden>
+            <rect x="0" y="0" width="20" height="3" rx="1.5" />
+            <rect x="0" y="7" width="13" height="3" rx="1.5" />
+            <rect x="0" y="14" width="7" height="3" rx="1.5" />
+          </svg>
+        </a>
+        <div className="HeaderSearch">
+          <button type="button" className="SearchTrigger HeaderSearchDesktopTrigger" onClick={onSearch}>
+            Search
+            <span className="SearchTriggerShortcut">
+              (<kbd>⌘</kbd>
+              <kbd>k</kbd>)
             </span>
           </button>
-        ))}
-        {PLANNED.map((item) => (
-          <div
-            key={item.name}
-            className="flex items-start gap-5 rounded-paper-lg border border-border bg-card/60 p-5"
-          >
-            <span className="min-w-0">
-              <span className="flex flex-wrap items-center gap-2">
-                <span className="font-display text-lg font-bold tracking-tight text-faint">{item.name}</span>
-                <Badge tone="plain">planned</Badge>
-              </span>
-              <span className="mt-1 block text-sm leading-relaxed text-faint">{item.note}</span>
-            </span>
+          <button type="button" className="SearchTrigger HeaderSearchMobileTrigger" onClick={onSearch}>
+            Search
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function SearchDialog({ open, onClose, onNavigate }: { open: boolean; onClose: () => void; onNavigate: (href: string) => void }) {
+  const [query, setQuery] = React.useState('');
+  const input = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (open) {
+      setQuery('');
+      window.setTimeout(() => input.current?.focus(), 20);
+    }
+  }, [open]);
+
+  React.useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  if (!open) return null;
+
+  const results = NAV.flatMap((group) => group.items.map((item) => ({ ...item, heading: group.heading }))).filter((item) =>
+    item.label.toLowerCase().includes(query.trim().toLowerCase()),
+  );
+
+  return (
+    <div
+      onMouseDown={onClose}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        background: 'var(--blackA-2)',
+        display: 'flex',
+        justifyContent: 'center',
+        paddingTop: '10vh',
+      }}
+    >
+      <div
+        onMouseDown={(event) => event.stopPropagation()}
+        style={{
+          width: 'min(32rem, calc(100vw - 2rem))',
+          height: 'fit-content',
+          background: 'var(--color-popup)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-12)',
+          boxShadow: 'var(--shadow-4)',
+          overflow: 'hidden',
+        }}
+      >
+        <input
+          ref={input}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search the docs"
+          style={{
+            width: '100%',
+            height: '3rem',
+            paddingInline: '1rem',
+            border: 0,
+            borderBottom: '1px solid var(--color-border)',
+            outline: 0,
+            fontFamily: 'var(--font-sans)',
+            fontSize: 'var(--font-size-15)',
+            background: 'transparent',
+            color: 'var(--color-foreground)',
+          }}
+        />
+        <ul style={{ listStyle: 'none', margin: 0, padding: '.5rem', maxHeight: '20rem', overflowY: 'auto' }}>
+          {results.map((item) => (
+            <li key={item.href}>
+              <button
+                type="button"
+                onClick={() => {
+                  onNavigate(item.href);
+                  onClose();
+                }}
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '1rem',
+                  padding: '.5rem .625rem',
+                  border: 0,
+                  background: 'transparent',
+                  borderRadius: 'var(--radius-6)',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: 'var(--font-size-14)',
+                  color: 'var(--color-foreground)',
+                  cursor: 'default',
+                  textAlign: 'left',
+                }}
+              >
+                {item.label}
+                <span style={{ color: 'var(--gray-t1)', fontSize: 'var(--font-size-13)' }}>{item.heading}</span>
+              </button>
+            </li>
+          ))}
+          {!results.length ? (
+            <li style={{ padding: '.75rem', color: 'var(--gray-t1)', fontSize: 'var(--font-size-14)' }}>No matches.</li>
+          ) : null}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function SideNav({ route }: { route: string }) {
+  return (
+    <nav aria-label="Main navigation" className="SideNavRoot">
+      <div className="SideNavViewport" data-side-nav-viewport="true" style={{ overflowY: 'auto' }}>
+        {NAV.map((group) => (
+          <div className="SideNavSection" key={group.heading}>
+            <div className="SideNavHeading">{group.heading}</div>
+            <ul className="SideNavList">
+              {group.items.map((item) => (
+                <li className="SideNavItem" key={item.href}>
+                  <a
+                    className="SideNavLink"
+                    href={item.href}
+                    aria-current={route === item.id ? 'true' : undefined}
+                    data-active={route === item.id ? 'true' : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         ))}
-      </div>
-
-      <Rule className="my-12" />
-
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div className="rounded-paper-lg border border-border bg-card p-6 shadow-card">
-          <Eyebrow className="mb-3">Why this layer</Eyebrow>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            A market scan found the chat layer has a dozen MIT competitors whose differences reviewers call “a week of
-            work either way”, while run tracking, replay, forking, budget meters and pre-execution approval have no
-            well-adopted open-source React answer.
-          </p>
+        <hr className="SideNavSeparator" />
+        <div className="SideNavSection">
+          <ul className="SideNavList">
+            <li className="SideNavItem">
+              <a className="SideNavLink" href={REPO} target="_blank" rel="noopener noreferrer">
+                <div className="SideNavLinkIconContainer">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                    <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.63 2.29 6.7 5.47 7.78.4.07.55-.17.55-.39 0-.19-.01-.84-.01-1.53-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.96-.82-1.16-.28-.15-.68-.53-.01-.54.63-.01 1.08.59 1.23.84.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.1-1.78-.2-3.64-.91-3.64-4.05 0-.89.31-1.63.82-2.2-.08-.21-.36-1.05.08-2.17 0 0 .67-.22 2.2.84.64-.18 1.32-.28 2-.28s1.36.09 2 .28c1.53-1.07 2.2-.84 2.2-.84.44 1.13.16 1.97.08 2.17.51.57.82 1.3.82 2.2 0 3.15-1.87 3.84-3.65 4.05.29.26.54.75.54 1.52 0 1.1-.01 1.98-.01 2.26 0 .22.15.47.55.39C13.71 14.9 16 11.82 16 8.2 16 3.67 12.42 0 8 0" />
+                  </svg>
+                  GitHub
+                </div>
+              </a>
+            </li>
+            <li className="SideNavItem">
+              <a className="SideNavLink" href={REPO} target="_blank" rel="noopener noreferrer">
+                <div className="SideNavLinkIconContainer">
+                  <svg fill="currentColor" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+                    <rect width="16" height="16" fill="black" />
+                    <rect x="3" y="3" width="10" height="10" fill="white" />
+                    <path d="M8 5H11V13H8V5Z" fill="black" />
+                  </svg>
+                  <span>
+                    npm
+                    <span className="SideNavVersion">0.1.0</span>
+                  </span>
+                </div>
+              </a>
+            </li>
+          </ul>
         </div>
-        <div className="rounded-paper-lg border border-border bg-card p-6 shadow-card">
-          <Eyebrow className="mb-3">Monochrome by design</Eyebrow>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Black, white and greys only. State is carried by shape, fill, weight and icon — a hollow dot is queued, a
-            pulsing ring is running, a filled dot is done — so the surfaces stay legible in any product’s brand.
-          </p>
-        </div>
       </div>
-    </article>
+    </nav>
+  );
+}
+
+type QuickNavItem = { id: string; label: string; children?: QuickNavItem[] };
+
+function QuickNav({ title, items }: { title: string; items: QuickNavItem[] }) {
+  const active = useActiveAnchor();
+  return (
+    <div className="QuickNavContainer">
+      <nav aria-label="On this page" className="QuickNavRoot">
+        <div className="QuickNavInner">
+          <div className="QuickNavViewport" style={{ overflowY: 'auto' }}>
+            <header className="bui-sr-only">{title}</header>
+            <ul className="QuickNavList">
+              <li className="QuickNavItem">
+                <a className="QuickNavLink" href="#">
+                  (Top)
+                </a>
+              </li>
+              {items.map((item) => (
+                <li className="QuickNavItem" key={item.id}>
+                  <a
+                    className="QuickNavLink"
+                    href={`#${item.id}`}
+                    aria-current={active === item.id ? 'true' : undefined}
+                    style={active === item.id ? { color: 'var(--gray-t2)' } : undefined}
+                  >
+                    {item.label}
+                  </a>
+                  {item.children?.length ? (
+                    <ul className="QuickNavList">
+                      {item.children.map((child) => (
+                        <li className="QuickNavItem" key={child.id}>
+                          <a
+                            className="QuickNavLink"
+                            href={`#${child.id}`}
+                            style={active === child.id ? { color: 'var(--gray-t2)' } : undefined}
+                          >
+                            {child.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+  );
+}
+
+/* ============================================================================
+   pages
+   ========================================================================== */
+
+function QuickStartPage() {
+  return (
+    <>
+      <MdH1 id="quick-start">Quick start</MdH1>
+      <Subtitle
+        links={
+          <SubtitleLink href={`${REPO}#readme`}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <path
+                d="M14.85 12.92H1.15A1.15 1.15 0 0 1 0 11.77V4.23a1.15 1.15 0 0 1 1.15-1.15h13.7a1.15 1.15 0 0 1 1.15 1.15v7.54a1.15 1.15 0 0 1-1.15 1.15M3.85 10.62V7.61l1.54 1.93 1.53-1.93v3h1.54V5.39H6.92l-1.53 1.92-1.54-1.92H2.31v5.23zm10.3-2.62H12.6V5.38h-1.53v2.62H9.54l2.3 2.69z"
+                fill="currentColor"
+              />
+            </svg>
+            View as Markdown
+          </SubtitleLink>
+        }
+      >
+        Ten components for running and managing AI workflows with React.
+      </Subtitle>
+
+      <MdP>
+        Paper is the <em>operations</em> layer of an AI product: watching a run, inspecting a step, replaying it, forking
+        it, comparing the branch, listing every run, watching the metrics, and approving a side effect before it happens.
+        The chat layer is commodity — this is the part that today only exists inside closed observability platforms.
+      </MdP>
+
+      <MdP>
+        There is no package to install. Every component is a file you copy into your project and own. They are built on{' '}
+        <Link href="https://ui.shadcn.com/" arrow>
+          shadcn/ui
+        </Link>{' '}
+        components, so they inherit your theme.
+      </MdP>
+
+      <Demo
+        code={`import { RunHeader } from '@/components/agent-ops/run-header';
+import { RunTimeline } from '@/components/agent-ops/run-timeline';
+
+export function RunPanel({ run, step, onSelectStep }) {
+  return (
+    <div className="grid gap-4">
+      <RunHeader run={run} />
+      <RunTimeline run={run} selectedStepId={step.id} onSelectStep={onSelectStep} />
+    </div>
+  );
+}`}
+        wide
+      >
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          <RunHeader run={RUN_ACTIVE} />
+          <RunTimeline run={RUN_ACTIVE} selectedStepId="s4" />
+        </div>
+      </Demo>
+
+      <MdH2 id="the-shared-model">The shared model</MdH2>
+      <MdP>
+        Every component speaks the same model, so you can feed them from any orchestrator. Nothing owns your data: pass
+        a <Code>Run</Code> in, get events out.
+      </MdP>
+      <MdUl>
+        <MdLi>
+          <Code>Workflow</Code> — id, name, version and its steps.
+        </MdLi>
+        <MdLi>
+          <Code>Run</Code> — status, trigger, totals, and the steps; optionally a <Code>parentRunId</Code> when it is a
+          fork.
+        </MdLi>
+        <MdLi>
+          <Code>RunStep</Code> — type (agent, llm, tool, human), status, duration, tokens, cost, input, output, error,
+          attempt.
+        </MdLi>
+        <MdLi>
+          <Code>RunEvent</Code> — timestamp, level (info, warn, error), type and message.
+        </MdLi>
+      </MdUl>
+
+      <MdH2 id="see-it-assembled">See it assembled</MdH2>
+      <MdP>
+        The <Link href="#/console">Operations console</Link> page stacks all ten the way a real ops screen uses them.
+      </MdP>
+    </>
   );
 }
 
 function InstallationPage() {
   return (
-    <article className="min-w-0 flex-1 pb-32">
-      <Eyebrow className="mb-4">Getting started</Eyebrow>
-      <h1 className="font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">Installation</h1>
-      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-        There is no package to install. Copy the component you need, keep the tokens, delete the rest.
-      </p>
+    <>
+      <MdH1 id="installation">Installation</MdH1>
+      <Subtitle>How to get the components into your project.</Subtitle>
 
-      <PageSection id="installation" title="Manual install">
-        <ManualInstall />
-      </PageSection>
+      <MdH2 id="install-the-dependencies">Install the dependencies</MdH2>
+      <MdP>Every component is plain React. Install the runtime helpers it imports — icons and the class helper.</MdP>
+      <InstallBlock packages="lucide-react clsx tailwind-merge" />
 
-      <PageSection id="usage" title="Requirements">
-        <ul className="space-y-2 text-sm text-muted-foreground">
-          <li>· React 19 · TypeScript</li>
-          <li>· Tailwind CSS v4 (the components use token utilities like bg-background, bg-card, border-border)</li>
-          <li>
-            · <code className="font-mono text-[12.5px] text-foreground">@base-ui/react</code> for the interactive internals
-          </li>
-          <li>
-            · <code className="font-mono text-[12.5px] text-foreground">lucide-react</code> for icons
-          </li>
-          <li>
-            · <code className="font-mono text-[12.5px] text-foreground">clsx</code> +{' '}
-            <code className="font-mono text-[12.5px] text-foreground">tailwind-merge</code> for the single{' '}
-            <code className="font-mono text-[12.5px] text-foreground">cn()</code> helper
-          </li>
-        </ul>
-      </PageSection>
+      <MdH2 id="copy-the-component">Copy the component</MdH2>
+      <MdP>
+        Copy the file you need from <Code>src/components/agent-ops</Code> into your project. Components compose the
+        primitives in <Code>src/components/ui</Code> (shadcn/ui) and the shared types in{' '}
+        <Code>components/agent-ops/types.ts</Code>.
+      </MdP>
+      <CodeBlock file="terminal" language="bash" code={`cp src/components/agent-ops/{run-header,run-timeline,types}.tsx ./src/components/agent-ops/`} />
 
-      <PageSection id="api" title="Tokens">
-        <CodeBlock
-          code={`:root {
-  --background: #f4f4f5;        /* page canvas (grey) */
-  --card: #ffffff;              /* component surfaces */
-  --muted: #f4f4f5;             /* wells, inert fills */
-  --border: #e4e4e7;            /* hairlines, always solid */
-  --foreground: #18181b;        /* primary text */
-  --primary: #09090b;           /* fills, active state */
-  --muted-foreground: #71717a;
-  --faint: #a1a1aa;
-  --radius: 6px;
-}
-[data-theme='dark'] {
-  --background: #09090b; --card: #18181b; --foreground: #fafafa; --primary: #fafafa;
+      <MdH2 id="set-up-styles">Set up styles</MdH2>
+      <MdP>
+        The components use the standard shadcn/ui CSS variables, plus Tailwind v4. If you already run shadcn/ui, there is
+        nothing to configure.
+      </MdP>
+      <CodeBlock
+        file="styles.css"
+        language="css"
+        code={`@import 'tailwindcss';
+
+:root {
+  --radius: 0.5rem;
+  --background: #ffffff;
+  --foreground: #2e2e2e;
+  --border: #00000014;
+  --muted: #f9f9f9;
+  --muted-foreground: #767676;
+  --primary: #2e2e2e;
+  --primary-foreground: #ffffff;
 }`}
-        />
-      </PageSection>
-    </article>
+      />
+
+      <MdH2 id="requirements">Requirements</MdH2>
+      <MdUl>
+        <MdLi>React 19 and TypeScript.</MdLi>
+        <MdLi>
+          Tailwind CSS v4, with{' '}
+          <Link href="https://ui.shadcn.com/" arrow>
+            shadcn/ui
+          </Link>{' '}
+          components available at <Code>@/components/ui</Code>.
+        </MdLi>
+        <MdLi>
+          <Code>lucide-react</Code> for icons.
+        </MdLi>
+      </MdUl>
+    </>
+  );
+}
+
+function StylingPage() {
+  return (
+    <>
+      <MdH1 id="styling">Styling</MdH1>
+      <Subtitle>How the components are styled, and how to make them yours.</Subtitle>
+
+      <MdH2 id="tokens">Tokens</MdH2>
+      <MdP>
+        Everything runs on CSS variables, so a rebrand is a variable change rather than a component fork. The values below
+        are the ones the components are designed against.
+      </MdP>
+      <CodeBlock
+        file="styles.css"
+        language="css"
+        code={`:root {
+  --background: #ffffff;
+  --foreground: #2e2e2e;
+  --card: #ffffff;
+  --muted: #f9f9f9;
+  --muted-foreground: #767676;
+  --border: #00000014;
+  --primary: #2e2e2e;
+  --primary-foreground: #ffffff;
+  --ring: #2e2e2e;
+  --radius: 0.5rem;
+}`}
+      />
+
+      <MdH2 id="state-without-colour">State without colour</MdH2>
+      <MdP>
+        A run has six states and the palette has no hues to spare, so state is carried by shape, fill, weight and icon —
+        which is also what makes the components legible in any product’s brand.
+      </MdP>
+      <MdUl>
+        <MdLi>Queued — a hollow circle.</MdLi>
+        <MdLi>Running — a spinning arc in the ring.</MdLi>
+        <MdLi>Waiting — a half-filled circle and a half-filled bar: blocked on a human.</MdLi>
+        <MdLi>Done — a filled circle with a check.</MdLi>
+        <MdLi>Failed — a circle with an ✕, plus the error inline.</MdLi>
+        <MdLi>Skipped — a faint outline and a strikethrough.</MdLi>
+      </MdUl>
+
+      <MdH2 id="overriding">Overriding</MdH2>
+      <MdP>
+        Every component accepts <Code>className</Code> and spreads the rest of its props onto its root element, so the
+        usual Tailwind escape hatches work.
+      </MdP>
+      <CodeBlock
+        code={`<StepDetail step={step} className="bg-muted/40" />`}
+      />
+    </>
+  );
+}
+
+function CompositionPage() {
+  return (
+    <>
+      <MdH1 id="composition">Composition</MdH1>
+      <Subtitle>One model, ten surfaces, no data owned by any of them.</Subtitle>
+
+      <MdH2 id="controlled">Controlled by default</MdH2>
+      <MdP>
+        Selection, replay position and filters are either controlled (<Code>value</Code> + <Code>onChange</Code>) or
+        local. Nothing reaches for a context you did not provide, so two consoles can sit on one page without
+        interfering.
+      </MdP>
+      <CodeBlock
+        code={`const [step, setStep] = React.useState(run.steps[0]);
+
+<RunTimeline run={run} selectedStepId={step.id} onSelectStep={setStep} />
+<StepDetail step={step} onRetry={() => retry(step)} />`}
+      />
+
+      <MdH2 id="data-flow">Data flow</MdH2>
+      <MdP>
+        The components are read-only views over data you already have. When your orchestrator emits something, pass the
+        new array in — the timeline, event stream and metrics all follow.
+      </MdP>
+      <CodeBlock
+        code={`// your orchestrator, your store, your socket
+socket.on('run:update', (run) => store.setRun(run));
+
+// the console is just a view
+<EventStream events={run.events} />`}
+      />
+
+      <MdH2 id="internal-primitives">Internal primitives</MdH2>
+      <MdP>
+        Anything under <Code>components/internal</Code> is implementation detail, not API. The public surface is the ten
+        components; if you delete an internal helper, the compiler tells you which component needed it.
+      </MdP>
+    </>
+  );
+}
+
+function TypeScriptPage() {
+  return (
+    <>
+      <MdH1 id="typescript">TypeScript</MdH1>
+      <Subtitle>The types are the documentation.</Subtitle>
+
+      <MdH2 id="the-model">The model</MdH2>
+      <MdP>Import the model once and every component accepts it.</MdP>
+      <CodeBlock
+        file="components/agent-ops/types.ts"
+        code={`export type StepType = 'agent' | 'llm' | 'tool' | 'human' | 'subworkflow';
+export type StepStatus = 'queued' | 'running' | 'done' | 'waiting' | 'failed' | 'skipped';
+export type RunStatus = 'queued' | 'running' | 'waiting' | 'paused' | 'succeeded' | 'failed' | 'cancelled';
+
+export interface RunStep {
+  id: string;
+  name: string;
+  type: StepType;
+  status: StepStatus;
+  durationMs?: number;
+  tokens?: number;
+  cost?: number;
+  attempt?: number;
+  input?: string;
+  output?: string;
+  error?: string;
+  meta?: string;
+}
+
+export interface Run {
+  id: string;
+  workflow: string;
+  workflowVersion?: string;
+  status: RunStatus;
+  trigger?: 'manual' | 'schedule' | 'webhook' | 'api';
+  startedAt?: string;
+  elapsed?: string;
+  heartbeat?: string;
+  checkpoint?: string;
+  tokens?: number;
+  cost?: number;
+  steps: RunStep[];
+  parentRunId?: string;
+  forkedFromStep?: string;
+}`}
+      />
+
+      <MdH2 id="extending">Extending</MdH2>
+      <MdP>
+        Add fields to <Code>RunStep</Code> and the components keep working: they render what they know and ignore the
+        rest. Where a component needs more, it takes a small dedicated type — for example{' '}
+        <Code>ApprovalRequest</Code> for the approval step.
+      </MdP>
+      <CodeBlock
+        code={`import type { Run, RunStep } from '@/components/agent-ops/types';
+
+function MyOwnTimeline({ run }: { run: Run }) {
+  return run.steps.map((step: RunStep) => step.name);
+}`}
+      />
+    </>
   );
 }
 
@@ -393,30 +700,35 @@ function ConsolePage() {
   }, [playing, speed, last]);
 
   return (
-    <article className="min-w-0 flex-1 pb-32">
-      <Eyebrow className="mb-4">The console</Eyebrow>
-      <h1 className="max-w-3xl font-display text-4xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-5xl">
-        Every workflow run, on one screen.
-      </h1>
-      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-        The ten components assembled the way a real ops console uses them: watch a live run, inspect a step, read the
-        event log, replay the whole thing, fork it, compare the branch, and manage the run list and its metrics.
-      </p>
+    <>
+      <MdH1 id="operations-console">Operations console</MdH1>
+      <Subtitle>All ten components on one screen, the way an ops product uses them.</Subtitle>
 
-      <div className="mt-8 space-y-6">
-        <RunHeader run={RUN_ACTIVE} />
+      <MdP>
+        Watch a live run, inspect a step, read the event log, replay the whole thing, fork it from a step, compare the
+        branch, then manage the run list and its metrics. Everything below is live — click a step, scrub the replay.
+      </MdP>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <RunTimeline run={RUN_ACTIVE} selectedStepId={step.id} onSelectStep={setStep} />
-          <div className="space-y-6">
+      <Demo wide file="agent-ops-console.tsx" code={`const [step, setStep] = React.useState(run.steps[3]);
+
+<RunHeader run={run} />
+<RunTimeline run={run} selectedStepId={step.id} onSelectStep={setStep} />
+<StepDetail step={step} onRetry={() => retry(step)} />
+<EventStream events={events} />`}>
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          <RunHeader run={RUN_ACTIVE} />
+          <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'minmax(0,1fr)' }}>
+            <RunTimeline run={RUN_ACTIVE} selectedStepId={step.id} onSelectStep={setStep} />
             <StepDetail step={step} />
             <EventStream events={EVENTS} />
           </div>
         </div>
+      </Demo>
 
-        <ApprovalStep request={APPROVAL_EMAIL} />
-
-        <div className="grid gap-6">
+      <Demo wide file="replay-fork.tsx" code={`<ReplayScrubber run={run} index={index} onChange={setIndex} />
+<ForkPanel run={run} step={step} onFork={fork} />
+<BranchCompare parent={parent} branch={branch} />`}>
+        <div style={{ display: 'grid', gap: '1rem' }}>
           <ReplayScrubber
             run={RUN_PARENT}
             index={index}
@@ -426,153 +738,189 @@ function ConsolePage() {
             speed={speed}
             onSpeedChange={setSpeed}
           />
-          <div className="grid gap-6 xl:grid-cols-2">
-            <ForkPanel run={RUN_PARENT} step={RUN_PARENT.steps[2]} />
-            <BranchCompare parent={RUN_PARENT} branch={RUN_BRANCH} />
-          </div>
+          <ForkPanel run={RUN_PARENT} step={RUN_PARENT.steps[2]} />
+          <BranchCompare parent={RUN_PARENT} branch={RUN_BRANCH} />
         </div>
+      </Demo>
 
-        <div className="grid gap-6">
+      <Demo wide file="approvals-metrics.tsx" code={`<ApprovalStep request={request} onApprove={approve} />
+<RunMetrics kpis={kpis} trend={trend} failures={failures} />
+<RunsTable runs={runs} onSelect={openRun} />`}>
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          <ApprovalStep request={APPROVAL_EMAIL} />
           <RunMetrics kpis={KPIS} trend={TREND} failures={FAILURES} />
           <RunsTable runs={RUNS} />
         </div>
-      </div>
-
-      <Rule className="my-12" />
-      <Card className="p-6">
-        <Eyebrow className="mb-3">Composition</Eyebrow>
-        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Every surface above reads the same shared model — <code className="font-mono text-[12px] text-foreground">Run</code>,{' '}
-          <code className="font-mono text-[12px] text-foreground">RunStep</code>,{' '}
-          <code className="font-mono text-[12px] text-foreground">RunEvent</code>. Feed them from your orchestrator and the
-          whole console stays in sync; no component owns your data.
-        </p>
-      </Card>
-    </article>
+      </Demo>
+    </>
   );
 }
 
+const COMPONENT_SECTIONS: QuickNavItem[] = [
+  { id: 'installation', label: 'Installation' },
+  { id: 'usage', label: 'Usage' },
+  { id: 'anatomy', label: 'Anatomy' },
+  { id: 'examples', label: 'Examples' },
+];
+
+function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string }) {
+  void route;
+  const examples = EXAMPLES[entry.id] ?? [];
+  return (
+    <>
+      <MdH1 id={entry.id}>{entry.name}</MdH1>
+      <Subtitle
+        links={
+          <>
+            <SubtitleLink href={`${REPO}/blob/main/src/${entry.file}`}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.63 2.29 6.7 5.47 7.78.4.07.55-.17.55-.39 0-.19-.01-.84-.01-1.53-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.96-.82-1.16-.28-.15-.68-.53-.01-.54.63-.01 1.08.59 1.23.84.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.1-1.78-.2-3.64-.91-3.64-4.05 0-.89.31-1.63.82-2.2-.08-.21-.36-1.05.08-2.17 0 0 .67-.22 2.2.84.64-.18 1.32-.28 2-.28s1.36.09 2 .28c1.53-1.07 2.2-.84 2.2-.84.44 1.13.16 1.97.08 2.17.51.57.82 1.3.82 2.2 0 3.15-1.87 3.84-3.65 4.05.29.26.54.75.54 1.52 0 1.1-.01 1.98-.01 2.26 0 .22.15.47.55.39C13.71 14.9 16 11.82 16 8.2 16 3.67 12.42 0 8 0" />
+              </svg>
+              View source
+            </SubtitleLink>
+            <SubtitleLink href={`${REPO}#readme`}>View as Markdown</SubtitleLink>
+          </>
+        }
+      >
+        {entry.tagline}
+      </Subtitle>
+
+      <MdP>{entry.description}</MdP>
+
+      <Demo code={entry.usage} file={`${entry.id}.tsx`} wide={entry.wide}>
+        {PREVIEWS[entry.id]}
+      </Demo>
+
+      <MdH2 id="installation">Installation</MdH2>
+      <MdP>
+        The component is built on shadcn/ui primitives. Add the ones it uses, then copy{' '}
+        <Code>src/{entry.file}</Code> into your project.
+      </MdP>
+      <CodeBlock file="terminal" language="bash" code={`pnpm dlx shadcn@latest add ${entry.primitives.join(' ')}`} />
+      {entry.deps.length ? (
+        <>
+          <MdP>And the packages the file imports:</MdP>
+          <InstallBlock packages={entry.deps.join(' ')} />
+        </>
+      ) : null}
+
+      <MdH2 id="usage">Usage</MdH2>
+      <CodeBlock code={entry.usage} />
+
+      <MdH2 id="anatomy">Anatomy</MdH2>
+      <MdP>Import the component and pass it the part of the model it renders.</MdP>
+      <CodeBlock code={entry.anatomy} />
+
+      <MdH2 id="examples">Examples</MdH2>
+      {examples.map((example, index) => (
+        <React.Fragment key={example.label}>
+          <MdH3 id={example.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}>{example.label}</MdH3>
+          <Demo code={entry.examples[index]?.code ?? entry.usage} wide={entry.wide}>
+            {example.node}
+          </Demo>
+        </React.Fragment>
+      ))}
+
+      <MdH2 id="api-reference">API reference</MdH2>
+      <ApiTable sections={entry.api} />
+    </>
+  );
+}
+
+/* ============================================================================
+   app
+   ========================================================================== */
+
 export default function DocsApp() {
   const route = useRoute();
-  const [theme, setTheme] = React.useState<'light' | 'dark'>('light');
+  const [searchOpen, setSearchOpen] = React.useState(false);
 
   React.useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const componentId = route.startsWith('components/') ? route.slice('components/'.length) : null;
   const entry = componentId ? getComponent(componentId) : undefined;
 
-  const isActive = (id: string) => route === id || componentId === id;
+  const quickNav: QuickNavItem[] = entry
+    ? [
+        ...COMPONENT_SECTIONS,
+        {
+          id: 'api-reference',
+          label: 'API reference',
+          children: entry.api.map((section) => ({
+            id: section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            label: section.title,
+          })),
+        },
+      ]
+    : route === 'installation'
+      ? [
+          { id: 'install-the-dependencies', label: 'Install the dependencies' },
+          { id: 'copy-the-component', label: 'Copy the component' },
+          { id: 'set-up-styles', label: 'Set up styles' },
+          { id: 'requirements', label: 'Requirements' },
+        ]
+      : route === 'styling'
+        ? [
+            { id: 'tokens', label: 'Tokens' },
+            { id: 'state-without-colour', label: 'State without colour' },
+            { id: 'overriding', label: 'Overriding' },
+          ]
+        : route === 'composition'
+          ? [
+              { id: 'controlled', label: 'Controlled by default' },
+              { id: 'data-flow', label: 'Data flow' },
+              { id: 'internal-primitives', label: 'Internal primitives' },
+            ]
+          : route === 'typescript'
+            ? [
+                { id: 'the-model', label: 'The model' },
+                { id: 'extending', label: 'Extending' },
+              ]
+            : [
+                { id: 'the-shared-model', label: 'The shared model' },
+                { id: 'see-it-assembled', label: 'See it assembled' },
+              ];
+
+  const page = entry ? (
+    <ComponentPage entry={entry} route={route} />
+  ) : route === 'installation' ? (
+    <InstallationPage />
+  ) : route === 'console' ? (
+    <ConsolePage />
+  ) : route === 'styling' ? (
+    <StylingPage />
+  ) : route === 'composition' ? (
+    <CompositionPage />
+  ) : route === 'typescript' ? (
+    <TypeScriptPage />
+  ) : (
+    <QuickStartPage />
+  );
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-[90rem] items-center gap-4 px-5">
-          <a href="#/introduction" className="flex items-center gap-2.5">
-            <span className="grid size-7 place-items-center rounded-paper bg-primary font-mono text-[13px] font-medium text-primary-foreground">
-              P
-            </span>
-            <span className="font-display text-base font-bold tracking-tight">Paper</span>
-            <Badge tone="muted">v0.1</Badge>
-          </a>
-          <div className="ml-auto flex items-center gap-2">
-            <a
-              href="https://github.com/MohammedAlshami"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden items-center gap-1.5 text-xs text-faint transition-colors hover:text-foreground sm:inline-flex"
-            >
-              GitHub <ExternalLink className="size-3" />
-            </a>
-            <Button variant="ghost" size="sm" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
-              {theme === 'light' ? 'Dark' : 'Light'} theme
-            </Button>
+    <div className="RootLayout">
+      <div className="RootLayoutContainer">
+        <div className="RootLayoutContent">
+          <div className="ContentLayoutRoot">
+            <Header onSearch={() => setSearchOpen(true)} />
+            <SideNav route={route} />
+            <main className="ContentLayoutMain" id="main-content">
+              <QuickNav title={entry?.name ?? 'Paper'} items={quickNav} />
+              <div className="QuickNavContent">{page}</div>
+            </main>
           </div>
         </div>
-      </header>
-
-      <div className="mx-auto flex max-w-[90rem] gap-10 px-5">
-        {/* Sidebar */}
-        <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 overflow-y-auto py-10 lg:block">
-          <Eyebrow className="mb-3">Getting started</Eyebrow>
-          <nav className="flex flex-col gap-0.5">
-            {START_PAGES.map((page) => (
-              <a
-                key={page.id}
-                href={`#/${page.id}`}
-                className={cn(
-                  'rounded-paper px-3 py-1.5 text-sm transition-colors',
-                  isActive(page.id)
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-card hover:text-foreground',
-                )}
-              >
-                {page.label}
-              </a>
-            ))}
-          </nav>
-
-          <Eyebrow className="mb-3 mt-8">Components</Eyebrow>
-          <nav className="flex flex-col gap-0.5">
-            {COMPONENTS.map((item) => (
-              <a
-                key={item.id}
-                href={`#/components/${item.id}`}
-                className={cn(
-                  'rounded-paper px-3 py-1.5 text-sm transition-colors',
-                  componentId === item.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-card hover:text-foreground',
-                )}
-              >
-                {item.name}
-              </a>
-            ))}
-            {PLANNED.map((item) => (
-              <span key={item.name} className="cursor-default px-3 py-1.5 text-sm text-faint">
-                {item.name}
-              </span>
-            ))}
-          </nav>
-
-          <Rule className="my-6" />
-          <p className="text-xs leading-relaxed text-faint">
-            Ten components. No primitives, no data grid, no chat shell.
-          </p>
-        </aside>
-
-        {/* Page */}
-        {entry ? (
-          <ComponentPage entry={entry} />
-        ) : route === 'installation' ? (
-          <InstallationPage />
-        ) : route === 'console' ? (
-          <ConsolePage />
-        ) : (
-          <IntroductionPage />
-        )}
-
-        {/* On this page */}
-        {entry ? (
-          <nav className="sticky top-20 hidden h-fit w-48 shrink-0 py-12 xl:block">
-            <Eyebrow className="mb-3">On this page</Eyebrow>
-            <ul className="border-l border-border">
-              {ON_THIS_PAGE.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' })}
-                    className="-ml-px block w-full border-l border-transparent py-1.5 pl-3 text-left text-sm text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
-                  >
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : null}
       </div>
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} onNavigate={(href) => (window.location.hash = href.replace(/^#/, ''))} />
     </div>
   );
 }

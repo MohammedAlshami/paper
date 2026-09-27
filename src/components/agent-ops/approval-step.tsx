@@ -2,11 +2,11 @@
 
 import * as React from 'react';
 import { Check, Clock, Pencil, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/internal/badge';
-import { Button } from '@/components/internal/button';
-import { Card } from '@/components/internal/card';
-import { Eyebrow } from '@/components/internal/eyebrow';
 import type { RunStep } from './types';
 
 export type Risk = 'low' | 'medium' | 'high';
@@ -35,59 +35,60 @@ export function ApprovalStep({
   onReject?: () => void;
   className?: string;
 }) {
-  const severity = request.risk === 'high' ? 'step 3 of 3' : request.risk === 'medium' ? 'step 2 of 3' : 'step 1 of 3';
+  const severity = request.risk === 'high' ? 'Step 3 of 3' : request.risk === 'medium' ? 'Step 2 of 3' : 'Step 1 of 3';
 
   return (
-    <Card className={cn('overflow-hidden', className)}>
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <Eyebrow>Step · human approval</Eyebrow>
-            <Badge tone="outline">{request.risk} risk</Badge>
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">{severity}</span>
+    <Card className={cn('gap-0 overflow-hidden py-0', className)}>
+      <CardHeader className="gap-3 py-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0 space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline">Human approval</Badge>
+              <Badge variant={request.risk === 'high' ? 'destructive' : 'secondary'}>{request.risk} risk</Badge>
+              <span className="font-mono text-xs text-muted-foreground">{severity}</span>
+            </div>
+            <CardTitle className="text-sm font-semibold tracking-tight">{request.action}</CardTitle>
+            <CardDescription>
+              Nothing runs until this is approved. The workflow is paused before{' '}
+              <span className="font-mono text-xs text-foreground">{request.tool}</span>.
+            </CardDescription>
           </div>
-          <h4 className="mt-2 font-display text-base font-bold tracking-tight text-foreground">{request.action}</h4>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Nothing runs until this is approved. The workflow is paused before{' '}
-            <span className="font-mono text-[12px] text-foreground">{request.tool}</span>.
-          </p>
+          {request.expiresIn ? (
+            <Badge variant="outline" className="gap-1">
+              <Clock /> {request.expiresIn}
+            </Badge>
+          ) : null}
         </div>
-        {request.expiresIn ? (
-          <Badge tone="muted">
-            <Clock className="size-3" /> {request.expiresIn}
-          </Badge>
-        ) : null}
-      </div>
+      </CardHeader>
 
-      <div className="overflow-hidden">
-        <p className="border-b border-border bg-muted px-4 py-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-faint">
-          arguments · {request.tool}
-        </p>
-        <pre className="overflow-x-auto bg-card p-4 font-mono text-[12px] leading-relaxed text-foreground">
-          {request.args}
-        </pre>
+      <Separator />
+      <div className="flex items-center gap-2 bg-muted px-6 py-1.5">
+        <span className="font-mono text-xs text-muted-foreground">arguments · {request.tool}</span>
       </div>
+      <pre className="overflow-x-auto px-6 py-4 font-mono text-xs leading-relaxed">{request.args}</pre>
 
       {request.reason ? (
-        <p className="border-t border-border px-4 py-3 text-sm leading-relaxed text-muted-foreground">
-          {request.reason}
-        </p>
+        <>
+          <Separator />
+          <p className="px-6 py-3 text-sm text-muted-foreground">{request.reason}</p>
+        </>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3">
-        <span className="mr-auto font-mono text-[11px] text-faint">
+      <Separator />
+      <CardContent className="flex flex-wrap items-center gap-2 py-4">
+        <span className="mr-auto font-mono text-xs text-muted-foreground">
           {request.requestedBy ?? 'requested by the agent'}
         </span>
         <Button size="sm" variant="outline" onClick={onReject}>
-          <X className="size-3.5" /> Reject
+          <X /> Reject
         </Button>
         <Button size="sm" variant="ghost">
-          <Pencil className="size-3.5" /> Edit arguments
+          <Pencil /> Edit arguments
         </Button>
         <Button size="sm" onClick={onApprove}>
-          <Check className="size-3.5" /> Approve and run
+          <Check /> Approve and run
         </Button>
-      </div>
+      </CardContent>
     </Card>
   );
 }

@@ -2,17 +2,24 @@
 
 import * as React from 'react';
 import { ArrowDownToLine } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/internal/card';
 import type { RunEvent } from './types';
 
-const levels: RunEvent['level'][] = ['info', 'warn', 'error'];
+const LEVELS: RunEvent['level'][] = ['info', 'warn', 'error'];
 
-const glyph: Record<RunEvent['level'], string> = { info: '·', warn: '!', error: '✕' };
+const GLYPH: Record<RunEvent['level'], string> = { info: '·', warn: '!', error: '✕' };
 
-/** EventStream — the run's live log. The honest record of what happened. */
+const VARIANT: Record<RunEvent['level'], 'secondary' | 'outline' | 'destructive'> = {
+  info: 'secondary',
+  warn: 'outline',
+  error: 'destructive',
+};
+
+/** EventStream — the run's live log, the honest record of what happened. */
 export function EventStream({ events, className }: { events: RunEvent[]; className?: string }) {
-  const [active, setActive] = React.useState<RunEvent['level'][]>(levels);
+  const [active, setActive] = React.useState<RunEvent['level'][]>(LEVELS);
   const [follow, setFollow] = React.useState(true);
   const scroller = React.useRef<HTMLDivElement>(null);
 
@@ -23,63 +30,49 @@ export function EventStream({ events, className }: { events: RunEvent[]; classNa
   }, [follow, events.length]);
 
   const toggle = (level: RunEvent['level']) =>
-    setActive((prev) => (prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]));
+    setActive((prev) => (prev.includes(level) ? prev.filter((item) => item !== level) : [...prev, level]));
 
   return (
-    <Card className={cn('flex flex-col overflow-hidden', className)}>
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <h4 className="text-sm font-medium text-foreground">Events</h4>
-        <div className="flex items-center gap-1">
-          {levels.map((level) => {
+    <Card className={cn('gap-0 overflow-hidden py-0', className)}>
+      <CardHeader className="flex-row items-center justify-between gap-3 py-4">
+        <CardTitle className="text-sm font-medium">Events</CardTitle>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {LEVELS.map((level) => {
             const on = active.includes(level);
             return (
-              <button
-                key={level}
-                type="button"
-                onClick={() => toggle(level)}
-                aria-pressed={on}
-                className={cn(
-                  'rounded-paper px-2 py-1 font-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors',
-                  on ? 'bg-primary text-primary-foreground' : 'text-faint hover:bg-muted hover:text-foreground',
-                )}
-              >
-                {glyph[level]} {level}
+              <button key={level} type="button" onClick={() => toggle(level)} aria-pressed={on}>
+                <Badge variant={on ? VARIANT[level] : 'outline'} className={cn('font-mono', !on && 'opacity-50')}>
+                  {GLYPH[level]} {level}
+                </Badge>
               </button>
             );
           })}
-          <button
-            type="button"
-            onClick={() => setFollow((v) => !v)}
-            aria-pressed={follow}
-            className={cn(
-              'ml-1 inline-flex items-center gap-1 rounded-paper px-2 py-1 font-mono text-[10.5px] uppercase tracking-[0.12em] transition-colors',
-              follow ? 'text-foreground' : 'text-faint hover:text-foreground',
-            )}
-          >
-            <ArrowDownToLine className="size-3" /> follow
+          <button type="button" onClick={() => setFollow((value) => !value)} aria-pressed={follow}>
+            <Badge variant={follow ? 'default' : 'outline'} className="font-mono">
+              <ArrowDownToLine /> follow
+            </Badge>
           </button>
         </div>
-      </div>
+      </CardHeader>
 
-      <div
-        ref={scroller}
-        className="max-h-72 overflow-y-auto border-t border-border bg-card font-mono text-[11.5px] leading-relaxed"
-      >
-        {shown.map((event) => (
-          <div key={event.id} className="flex gap-3 border-b border-border/60 px-4 py-1.5 last:border-b-0">
-            <span className="tabular shrink-0 text-faint">{event.ts}</span>
-            <span className={cn('shrink-0 w-3 text-center', event.level === 'info' ? 'text-faint' : 'text-foreground')}>
-              {glyph[event.level]}
-            </span>
-            <span className="shrink-0 text-faint">{event.type}</span>
-            <span className={cn('min-w-0 flex-1 truncate', event.level === 'info' ? 'text-muted-foreground' : 'text-foreground')}>
-              {event.message}
-            </span>
-            {event.stepId ? <span className="shrink-0 text-faint">{event.stepId}</span> : null}
-          </div>
-        ))}
-        {!shown.length ? <p className="px-4 py-6 text-faint">No events at these levels.</p> : null}
-      </div>
+      <CardContent className="p-0">
+        <div ref={scroller} className="max-h-72 overflow-y-auto border-t font-mono text-xs leading-relaxed">
+          {shown.map((event) => (
+            <div key={event.id} className="flex gap-3 border-b px-6 py-1.5 last:border-b-0">
+              <span className="shrink-0 text-muted-foreground tabular-nums">{event.ts}</span>
+              <span className={cn('w-3 shrink-0 text-center', event.level === 'info' && 'text-muted-foreground')}>
+                {GLYPH[event.level]}
+              </span>
+              <span className="shrink-0 text-muted-foreground">{event.type}</span>
+              <span className={cn('min-w-0 flex-1 truncate', event.level === 'error' && 'text-destructive')}>
+                {event.message}
+              </span>
+              {event.stepId ? <span className="shrink-0 text-muted-foreground">{event.stepId}</span> : null}
+            </div>
+          ))}
+          {!shown.length ? <p className="px-6 py-6 text-muted-foreground">No events at these levels.</p> : null}
+        </div>
+      </CardContent>
     </Card>
   );
 }

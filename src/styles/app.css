@@ -1,120 +1,140 @@
-/* Fonts */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap');
+/*
+  base-ui.com's design system, copied verbatim (fonts, tokens, layout, markdown,
+  code blocks, demo frames, API-reference accordions, syntax highlighting).
+  It is imported first so our own utility classes (below) win any name clash.
+*/
+@import './baseui/01-44ff1ae4349b6959.css';
+@import './baseui/02-0c3ac0218c2685bc.css';
+@import './baseui/03-ed81178c91e5ace3.css';
+@import './baseui/04-2afa6cec447785ac.css';
+@import './baseui/05-0e11bf85f41ee0b7.css';
+@import './baseui/06-daa4302ffc926253.css';
+@import './baseui/07-4f3e683c0e619945.css';
+@import './baseui/08-543e2f9cd0650fcf.css';
+@import './baseui/09-4fb3c78cd6c0e5f5.css';
+@import './baseui/10-366f8b42fe7a6f53.css';
+@import './baseui/11-f0b7e9a19835187a.css';
+@import './baseui/12-a63c42a6718ef0be.css';
+@import './baseui/13-0096d1d1ffb3434e.css';
 
 @import 'tailwindcss';
 
+@custom-variant dark (&:is(.dark *));
+
 /*
-  Paper — monochrome ops surfaces.
-  Black, white and greys only. Hairlines are solid. Cards are white on a grey canvas
-  so components stand out. State is carried by shape, fill, weight and icon — never hue.
+  shadcn/ui tokens, tuned to the same palette the docs use, so our components and
+  the documentation shell look like one product: white surfaces, #2e2e2e ink,
+  8%-black hairlines, #f9f9f9 wells, #767676 muted text.
 */
 :root {
-  --background: #f4f4f5; /* page canvas */
-  --card: #ffffff; /* component surfaces */
-  --muted: #f4f4f5; /* wells, code, inert fills */
-  --muted-strong: #e4e4e7;
-  --border: #e4e4e7; /* hairlines */
-  --border-strong: #d4d4d8;
-  --foreground: #18181b; /* primary text */
-  --primary: #09090b; /* buttons, fills, active */
-  --primary-foreground: #fafafa;
-  --muted-foreground: #71717a;
-  --faint: #a1a1aa;
-  --ring: #09090b;
+  --radius: 0.5rem;
 
-  --radius: 6px;
-  --radius-lg: 8px;
+  --background: #ffffff;
+  --foreground: #2e2e2e;
+  --card: #ffffff;
+  --card-foreground: #2e2e2e;
+  --popover: #ffffff;
+  --popover-foreground: #2e2e2e;
+  --primary: #2e2e2e;
+  --primary-foreground: #ffffff;
+  --secondary: #f9f9f9;
+  --secondary-foreground: #2e2e2e;
+  --muted: #f9f9f9;
+  --muted-foreground: #767676;
+  --accent: #f3f3f3;
+  --accent-foreground: #2e2e2e;
+  --destructive: #e43411;
+  --border: #00000014;
+  --input: #00000029;
+  --ring: #2e2e2e;
 
-  --shadow-card: 0 1px 2px rgba(9, 9, 11, 0.04), 0 1px 3px rgba(9, 9, 11, 0.06);
+  --chart-1: #2e2e2e;
+  --chart-2: #767676;
+  --chart-3: #a3a3a3;
+  --chart-4: #d4d4d4;
+  --chart-5: #e5e5e5;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', 'Helvetica Neue', sans-serif;
-  --font-display: 'Syne', var(--font-sans);
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --sidebar: #fcfcfc;
+  --sidebar-foreground: #2e2e2e;
+  --sidebar-primary: #2e2e2e;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f3f3f3;
+  --sidebar-accent-foreground: #2e2e2e;
+  --sidebar-border: #00000014;
+  --sidebar-ring: #2e2e2e;
 }
 
-[data-theme='dark'] {
-  --background: #09090b;
-  --card: #18181b;
-  --muted: #131316;
-  --muted-strong: #27272a;
-  --border: #27272a;
-  --border-strong: #3f3f46;
+.dark {
+  --background: #0a0a0a;
   --foreground: #fafafa;
+  --card: #141414;
+  --card-foreground: #fafafa;
+  --popover: #141414;
+  --popover-foreground: #fafafa;
   --primary: #fafafa;
-  --primary-foreground: #09090b;
-  --muted-foreground: #a1a1aa;
-  --faint: #71717a;
-  --ring: #fafafa;
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --primary-foreground: #171717;
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #fafafa;
+  --destructive: #fb6446;
+  --border: #ffffff1f;
+  --input: #ffffff29;
+  --ring: #737373;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-card: var(--card);
-  --color-muted: var(--muted);
-  --color-muted-strong: var(--muted-strong);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: var(--font-sans);
-  --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 
-  --radius-paper: var(--radius);
-  --radius-paper-lg: var(--radius-lg);
+  --font-sans: 'die grotesk a', system-ui, sans-serif;
+  --font-sans-b: 'die grotesk b', system-ui, sans-serif;
+  --font-mono: 'Paper Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @layer base {
-  html {
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
-  }
-
-  ::selection {
-    background: var(--foreground);
-    color: var(--card);
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+  * {
+    border-color: var(--border);
   }
 }
 
-@layer utilities {
-  .shadow-card {
-    box-shadow: var(--shadow-card);
-  }
-
-  /* Blocked / waiting: a monochrome hatch, the only texture in the system. */
-  .hatch {
-    background-image: repeating-linear-gradient(
-      45deg,
-      var(--border-strong) 0,
-      var(--border-strong) 1px,
-      transparent 1px,
-      transparent 5px
-    );
-  }
-
-  .tabular {
-    font-variant-numeric: tabular-nums;
-  }
-}
-
-@keyframes slide {
+@keyframes track-slide {
   0% {
     transform: translateX(-110%);
   }
