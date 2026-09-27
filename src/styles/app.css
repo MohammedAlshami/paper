@@ -1,0 +1,98 @@
+@import 'tailwindcss';
+
+/* Fonts — same families the portfolio references (JetBrains Mono + editorial display faces). */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
+
+/*
+  Paper — light editorial theme.
+  Inverts the portfolio palette: cream paper, near-black ink, dashed rules.
+*/
+:root {
+  --paper: #fff7dd;
+  --paper-raised: #fffdf5;
+  --paper-sunk: #f6ecd2;
+
+  --ink: #0e100f;
+  --ink-muted: rgba(14, 16, 15, 0.62);
+  --ink-faint: rgba(14, 16, 15, 0.38);
+  --line: rgba(14, 16, 15, 0.22);
+  --line-strong: rgba(14, 16, 15, 0.4);
+
+  --accent: #b4791f;
+  --accent-soft: rgba(180, 121, 31, 0.14);
+
+  --highlight-amber: rgba(252, 211, 77, 0.5);
+  --highlight-rose: rgba(253, 164, 175, 0.45);
+  --highlight-sky: rgba(125, 211, 252, 0.45);
+  --highlight-lime: rgba(190, 242, 100, 0.45);
+
+  --radius: 0.75rem;
+  --radius-lg: 1rem;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-display: 'Syne', var(--font-sans);
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Map the tokens to Tailwind utilities: bg-paper, text-ink, border-line, font-display, … */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-raised: var(--paper-raised);
+  --color-sunk: var(--paper-sunk);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+
+  --radius-paper: var(--radius);
+  --radius-paper-lg: var(--radius-lg);
+}
+
+/* Optional dark variant — the portfolio look, one attribute away. */
+[data-theme='dark'] {
+  --paper: #0e100f;
+  --paper-raised: #141816;
+  --paper-sunk: #0a0c0b;
+
+  --ink: #fff7dd;
+  --ink-muted: rgba(255, 247, 221, 0.66);
+  --ink-faint: rgba(255, 247, 221, 0.4);
+  --line: rgba(255, 247, 221, 0.24);
+  --line-strong: rgba(255, 247, 221, 0.45);
+
+  --accent: #e0b25c;
+  --accent-soft: rgba(224, 178, 92, 0.18);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+  }
+
+  ::selection {
+    background: var(--highlight-amber);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+}
