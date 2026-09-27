@@ -394,7 +394,7 @@ function QuickStartPage() {
           </SubtitleLink>
         }
       >
-        Ten components for running and managing AI workflows with React.
+        Thirty components for running and managing AI workflows with React.
       </Subtitle>
 
       <MdP>
@@ -455,7 +455,7 @@ export function RunPanel({ run, step, onSelectStep }) {
 
       <MdH2 id="see-it-assembled">See it assembled</MdH2>
       <MdP>
-        The <Link href="#/console">Operations console</Link> page stacks all ten the way a real ops screen uses them.
+        The <Link href="#/console">Operations console</Link> page stacks them the way a real ops screen uses them.
       </MdP>
     </>
   );
@@ -702,7 +702,7 @@ function ConsolePage() {
   return (
     <>
       <MdH1 id="operations-console">Operations console</MdH1>
-      <Subtitle>All ten components on one screen, the way an ops product uses them.</Subtitle>
+      <Subtitle>The run surfaces on one screen, the way an ops product uses them.</Subtitle>
 
       <MdP>
         Watch a live run, inspect a step, read the event log, replay the whole thing, fork it from a step, compare the
