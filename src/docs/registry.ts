@@ -1,4 +1,5 @@
 import type { ApiSection } from './md';
+import { OPS_COMPONENTS } from './registry-ops';
 
 export type ComponentEntry = {
   id: string;
@@ -35,7 +36,7 @@ const SHARED_ROWS = [
   },
 ];
 
-export const COMPONENTS: ComponentEntry[] = [
+const CORE_COMPONENTS: ComponentEntry[] = [
   {
     id: 'run-header',
     name: 'RunHeader',
@@ -412,5 +413,7 @@ const [playing, setPlaying] = React.useState(false);
     ],
   },
 ];
+
+export const COMPONENTS: ComponentEntry[] = [...CORE_COMPONENTS, ...OPS_COMPONENTS];
 
 export const getComponent = (id: string) => COMPONENTS.find((entry) => entry.id === id);

@@ -154,6 +154,25 @@ function CopyButton({ code }: { code: string }) {
 
 /* ---------- code blocks ---------- */
 
+/**
+ * base-ui puts the horizontal padding of a code block on the `frame`/`line` spans
+ * (`.CodeBlockRoot code .frame { padding-inline: .75rem }`), so the markup has to
+ * wrap the code the same way or it sits flush against the border.
+ */
+export function CodeLines({ code }: { code: string }) {
+  const lines = code.split('\n');
+  return (
+    <span className="frame">
+      {lines.map((line, index) => (
+        <span className="line" key={index}>
+          {highlight(line)}
+          {index < lines.length - 1 ? '\n' : ''}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export function CodeBlock({
   file,
   code,
@@ -176,7 +195,9 @@ export function CodeBlock({
       <div className="CodeBlockPreContainer">
         <div className="CodeBlockViewport">
           <pre className="CodeBlockPreInline CodeBlockPre" spellCheck={false}>
-            <code className={`language-${language}`}>{highlight(code)}</code>
+            <code className={`language-${language}`}>
+              <CodeLines code={code} />
+            </code>
           </pre>
         </div>
       </div>
@@ -227,7 +248,9 @@ export function InstallBlock({ packages }: { packages: string }) {
           <div className="CodeBlockPreContainer">
             <div className="CodeBlockViewport">
               <pre className="CodeBlockPreInline CodeBlockPre" spellCheck={false}>
-                <code className="language-bash">{highlight(command)}</code>
+                <code className="language-bash">
+                  <CodeLines code={command} />
+                </code>
               </pre>
             </div>
           </div>
@@ -282,7 +305,9 @@ export function Demo({
           <div className="DemoCodeBlockRoot">
             <div className="DemoSourceBrowser">
               <pre className="CodeBlockPreInline" spellCheck={false}>
-                <code className="language-tsx">{highlight(code)}</code>
+                <code className="language-tsx">
+                  <CodeLines code={code} />
+                </code>
               </pre>
             </div>
           </div>

@@ -301,7 +301,7 @@ function SideNav({ route }: { route: string }) {
               </a>
             </li>
             <li className="SideNavItem">
-              <a className="SideNavLink" href={REPO} target="_blank" rel="noopener noreferrer">
+              <a className="SideNavLink" href={`${REPO}/releases`} target="_blank" rel="noopener noreferrer">
                 <div className="SideNavLinkIconContainer">
                   <svg fill="currentColor" width="16" height="16" viewBox="0 0 16 16" aria-hidden>
                     <rect width="16" height="16" fill="black" />
@@ -309,7 +309,7 @@ function SideNav({ route }: { route: string }) {
                     <path d="M8 5H11V13H8V5Z" fill="black" />
                   </svg>
                   <span>
-                    npm
+                    releases
                     <span className="SideNavVersion">0.1.0</span>
                   </span>
                 </div>
