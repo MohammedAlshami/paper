@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Paper">
+  <rect width="64" height="64" rx="14" fill="#0e100f"/>
+  <text x="32" y="34" text-anchor="middle" dominant-baseline="middle"
+        font-family="SF Pro Display, Helvetica, Arial, sans-serif"
+        font-weight="700" font-size="38" fill="#ffffff">P</text>
+</svg>

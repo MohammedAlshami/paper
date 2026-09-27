@@ -23,6 +23,8 @@
 
   --accent: #b4791f;
   --accent-soft: rgba(180, 121, 31, 0.12);
+  --danger: #9f2f22;
+  --danger-soft: rgba(159, 47, 34, 0.1);
 
   --highlight-amber: rgba(252, 211, 77, 0.5);
   --highlight-rose: rgba(253, 164, 175, 0.45);
@@ -50,6 +52,8 @@
   --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
 
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);

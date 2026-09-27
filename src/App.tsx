@@ -17,12 +17,17 @@ import { Eyebrow } from '@/components/editorial/eyebrow';
 import { FeatureCard } from '@/components/editorial/feature-card';
 import { Illustration, ILLUSTRATIONS } from '@/components/editorial/illustration';
 import { SectionHeading } from '@/components/editorial/section-heading';
+import { RunTimeline, type AgentRun } from '@/components/agent-ops/run-timeline';
+import { ApprovalGate, type ApprovalRequest } from '@/components/agent-ops/approval-gate';
+import { TraceInspector, type Span } from '@/components/agent-ops/trace-inspector';
+import { CostMeter } from '@/components/agent-ops/cost-meter';
 
 const NAV = [
   { id: 'start', label: 'Getting started' },
   { id: 'foundations', label: 'Foundations' },
   { id: 'editorial', label: 'Editorial' },
   { id: 'components', label: 'Components' },
+  { id: 'agent-ops', label: 'Agent ops (gap)' },
   { id: 'illustrations', label: 'Illustrations' },
   { id: 'roadmap', label: 'Roadmap' },
 ];
@@ -42,6 +47,79 @@ function Snippet({ children }: { children: string }) {
     </pre>
   );
 }
+
+const MOCK_RUN: AgentRun = {
+  id: 'run_9f3a',
+  title: 'Draft chapter 3 — citation pass',
+  status: 'waiting',
+  heartbeat: '4s ago',
+  checkpoint: 'after step 3',
+  steps: [
+    { id: 'plan', label: 'Plan the chapter outline', status: 'done', meta: '1.2s · 412 tokens', at: '10:02' },
+    { id: 'search', label: 'Search the reference index (tool)', status: 'done', meta: '5 results · 84ms', at: '10:02' },
+    { id: 'extract', label: 'Extract PDF text', status: 'done', meta: '3 papers · language checked', at: '10:04' },
+    { id: 'draft', label: 'Draft section with citations', status: 'running', meta: '2,140 tokens', at: '10:05' },
+    { id: 'send', label: 'Await approval: email the co-author', status: 'waiting', meta: 'approval gate', at: '10:06' },
+    { id: 'publish', label: 'Publish to the workspace', status: 'pending' },
+  ],
+};
+
+const MOCK_APPROVAL: ApprovalRequest = {
+  id: 'ap_4412',
+  action: 'Send email to 3 recipients',
+  tool: 'mail.send',
+  risk: 'medium',
+  requestedBy: 'the agent · step 5',
+  expiresIn: 'expires in 9m',
+  reason:
+    'The draft is finished. Sending cannot be undone, so the run pauses here until a person approves the recipients and the body.',
+  args: `{
+  "to": ["sara@example.com", "omar@example.com", "editor@journal.org"],
+  "subject": "Chapter 3 — draft for review",
+  "attach": "chapter-3.docx"
+}`,
+};
+
+const MOCK_SPANS: Span[] = [
+  {
+    id: 's1',
+    name: 'agent.run',
+    kind: 'agent',
+    durationMs: 18420,
+    input: '{ "goal": "draft chapter 3", "run": "run_9f3a" }',
+    output: '{ "steps": 5, "status": "waiting", "checkpoint": 3 }',
+  },
+  {
+    id: 's2',
+    name: 'llm.complete · plan the outline',
+    kind: 'llm',
+    durationMs: 1180,
+    tokens: 412,
+    cost: 0.0012,
+    input: '{"messages":3,"model":"gpt-5"}',
+    output: '{"plan":["outline","search","extract","draft","send"]}',
+  },
+  {
+    id: 's3',
+    name: 'tool.references_search',
+    kind: 'tool',
+    durationMs: 84,
+    cost: 0.0015,
+    input: '{ "q": "marketing", "mode": "papers", "limit": 5 }',
+    output: '{ "count": 5, "took_ms": 84 }',
+  },
+  {
+    id: 's4',
+    name: 'llm.complete · draft section',
+    kind: 'llm',
+    durationMs: 9240,
+    tokens: 2140,
+    cost: 0.0078,
+    status: 'error',
+    input: '{"context":"3 papers","max_tokens":4000}',
+    output: '{ "error": "context window exceeded", "retryable": true }',
+  },
+];
 
 function Block({
   id,
@@ -453,6 +531,63 @@ export default function App() {
                     <Skeleton className="h-4 w-1/2" />
                     <Skeleton className="h-24 w-full" />
                   </div>
+                </Preview>
+              </Block>
+            </div>
+          </section>
+
+          <Rule />
+
+          {/* Agent ops — the gap */}
+          <section id="agent-ops" className="scroll-mt-24 py-10">
+            <SectionHeading
+              eyebrow="Agent ops — the gap"
+              title="The layer that makes agents observable"
+              description="Chat shells are commodity. These four surfaces are what AI builders actually hit — and today they exist only inside closed observability platforms. Rendered in the same editorial system, so the identity carries the wedge."
+            />
+            <div className="mt-8 space-y-4">
+              <Block
+                id="run-timeline"
+                title="RunTimeline"
+                note="A long-running agent run: per-step state, a heartbeat, a checkpoint, and pause / resume / fork. This is the surface that currently dies silently."
+                code={`<RunTimeline run={run} onPause={pause} onResume={resume} />`}
+              >
+                <Preview className="bg-transparent p-0">
+                  <RunTimeline run={MOCK_RUN} />
+                </Preview>
+              </Block>
+
+              <Block
+                id="approval-gate"
+                title="ApprovalGate"
+                note="The decision happens before the side effect, bound to the run — not an “Approve” button bolted on at the end."
+                code={`<ApprovalGate request={request} onApprove={approve} onReject={reject} />`}
+              >
+                <Preview className="bg-transparent p-0">
+                  <ApprovalGate request={MOCK_APPROVAL} />
+                </Preview>
+              </Block>
+
+              <Block
+                id="trace-inspector"
+                title="TraceInspector"
+                note="An embeddable span viewer with OTel-shaped props: duration bars, token and cost per span, and expandable input/output. Click a row."
+                code={`<TraceInspector spans={spans} currency="$" />`}
+                wide
+              >
+                <Preview className="bg-transparent p-0">
+                  <TraceInspector spans={MOCK_SPANS} />
+                </Preview>
+              </Block>
+
+              <Block
+                id="cost-meter"
+                title="CostMeter"
+                note="Spent vs budget, burn rate, a projection and a pause control — enforced before each tool call. Solved at the gateway layer, absent as a React surface."
+                code={`<CostMeter spent={18.42} budget={25} burnPerHour={3.1} hoursElapsed={6} />`}
+              >
+                <Preview className="bg-transparent p-0">
+                  <CostMeter spent={18.42} budget={25} burnPerHour={3.1} hoursElapsed={6} />
                 </Preview>
               </Block>
             </div>
