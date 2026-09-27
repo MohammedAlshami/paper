@@ -7,21 +7,22 @@
 
 /*
   Paper — light editorial theme.
-  Inverts the portfolio palette: cream paper, near-black ink, dashed rules.
+  Light theme: white cards on a light-grey page, near-black ink, dashed rules.
+  The dark variant (below) is the portfolio's cream-on-near-black palette.
 */
 :root {
-  --paper: #fff7dd;
-  --paper-raised: #fffdf5;
-  --paper-sunk: #f6ecd2;
+  --paper: #f6f6f4; /* page background: light grey */
+  --paper-raised: #ffffff; /* cards and surfaces: white */
+  --paper-sunk: #eceae6; /* wells, code blocks */
 
   --ink: #0e100f;
-  --ink-muted: rgba(14, 16, 15, 0.62);
-  --ink-faint: rgba(14, 16, 15, 0.38);
-  --line: rgba(14, 16, 15, 0.22);
-  --line-strong: rgba(14, 16, 15, 0.4);
+  --ink-muted: rgba(14, 16, 15, 0.6);
+  --ink-faint: rgba(14, 16, 15, 0.36);
+  --line: rgba(14, 16, 15, 0.16);
+  --line-strong: rgba(14, 16, 15, 0.34);
 
   --accent: #b4791f;
-  --accent-soft: rgba(180, 121, 31, 0.14);
+  --accent-soft: rgba(180, 121, 31, 0.12);
 
   --highlight-amber: rgba(252, 211, 77, 0.5);
   --highlight-rose: rgba(253, 164, 175, 0.45);

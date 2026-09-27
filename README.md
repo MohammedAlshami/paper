@@ -1,6 +1,6 @@
 # Paper — a light editorial React UI kit
 
-Copy-paste React components with an editorial, illustrated light theme: **cream paper, near-black ink, dashed rules, line-art illustrations.** No package to install, no version to chase — you copy the component file into your project and own it.
+Copy-paste React components with an editorial, illustrated light theme: **white and light-grey surfaces, near-black ink, dashed rules, line-art illustrations.** No package to install, no version to chase — you copy the component file into your project and own it.
 
 Everything inherits from a handful of CSS variables, so the **dark editorial variant** (the near-black/cream palette) is one attribute away.
 
@@ -59,8 +59,12 @@ Swap them for your own art by editing one map — the keys stay the same.
 ## Themes
 
 ```css
-:root { --paper: #fff7dd; --ink: #0e100f; }         /* light (default) */
-[data-theme='dark'] { --paper: #0e100f; --ink: #fff7dd; }  /* dark editorial */
+:root {
+  --paper: #f6f6f4;        /* page: light grey */
+  --paper-raised: #ffffff; /* cards: white */
+  --ink: #0e100f;
+}
+[data-theme='dark'] { --paper: #0e100f; --paper-raised: #141816; --ink: #fff7dd; }
 ```
 
 Set `data-theme="dark"` on `<html>` and the whole kit flips.

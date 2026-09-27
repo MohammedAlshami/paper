@@ -138,9 +138,10 @@ export default function App() {
               An editorial interface kit for people who care how it looks.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-relaxed text-ink-muted">
-              Paper is a light, illustrated component set: cream stock, near-black ink, dashed rules and
-              line-art illustrations. You copy the components into your project and own them — there is no
-              runtime package, no version to chase, and every token is a CSS variable you can rewrite.
+              Paper is a light, illustrated component set: white and light-grey surfaces, near-black ink,
+              dashed rules and line-art illustrations. You copy the components into your project and own
+              them — there is no runtime package, no version to chase, and every token is a CSS variable you
+              can rewrite.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button
