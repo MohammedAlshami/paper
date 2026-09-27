@@ -3,10 +3,10 @@
 import * as React from 'react';
 import { Gauge, Pause, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Rule } from '@/components/ui/rule';
-import { Eyebrow } from '@/components/editorial/eyebrow';
+import { Badge } from '@/components/internal/badge';
+import { Button } from '@/components/internal/button';
+import { Rule } from '@/components/internal/rule';
+import { Eyebrow } from '@/components/internal/eyebrow';
 
 /**
  * Cost and token budget meter — spent vs budget, burn rate and a forecast.

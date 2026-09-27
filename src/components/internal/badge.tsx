@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-type Tone = 'default' | 'ink' | 'accent' | 'faint';
+type Tone = 'default' | 'ink' | 'accent' | 'faint' | 'danger';
 
 const tones: Record<Tone, string> = {
   default: 'border-line text-ink-muted',
   ink: 'border-transparent bg-ink text-paper',
   accent: 'border-transparent bg-accent-soft text-accent',
   faint: 'border-line text-ink-faint',
+  danger: 'border-transparent bg-danger-soft text-danger',
 };
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {

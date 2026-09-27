@@ -3,9 +3,9 @@
 import * as React from 'react';
 import { Check, Clock, ShieldAlert, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Eyebrow } from '@/components/editorial/eyebrow';
+import { Badge } from '@/components/internal/badge';
+import { Button } from '@/components/internal/button';
+import { Eyebrow } from '@/components/internal/eyebrow';
 
 export type Risk = 'low' | 'medium' | 'high';
 

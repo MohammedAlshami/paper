@@ -3,9 +3,9 @@
 import * as React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Rule } from '@/components/ui/rule';
-import { Eyebrow } from '@/components/editorial/eyebrow';
+import { Badge } from '@/components/internal/badge';
+import { Rule } from '@/components/internal/rule';
+import { Eyebrow } from '@/components/internal/eyebrow';
 
 export type SpanKind = 'agent' | 'llm' | 'tool' | 'retrieval';
 

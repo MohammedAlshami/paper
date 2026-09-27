@@ -3,9 +3,9 @@
 import * as React from 'react';
 import { Check, CircleAlert, CircleDashed, Loader2, Pause, Play, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Rule } from '@/components/ui/rule';
+import { Badge } from '@/components/internal/badge';
+import { Button } from '@/components/internal/button';
+import { Rule } from '@/components/internal/rule';
 
 export type RunStatus = 'running' | 'succeeded' | 'failed' | 'paused' | 'waiting';
 export type StepStatus = 'done' | 'running' | 'waiting' | 'failed' | 'pending';
