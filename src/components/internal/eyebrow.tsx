@@ -3,15 +3,9 @@ import { cn } from '@/lib/utils';
 
 export interface EyebrowProps extends React.HTMLAttributes<HTMLParagraphElement> {}
 
-/** Tiny uppercase kicker that sits above a heading. */
+/** Tiny uppercase label above a title. */
 export function Eyebrow({ className, ...props }: EyebrowProps) {
   return (
-    <p
-      className={cn(
-        'text-[0.7rem] font-medium uppercase tracking-[0.28em] text-ink-faint',
-        className,
-      )}
-      {...props}
-    />
+    <p className={cn('text-[0.68rem] font-medium uppercase tracking-[0.2em] text-faint', className)} {...props} />
   );
 }

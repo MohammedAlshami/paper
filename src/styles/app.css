@@ -1,83 +1,74 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap');
+
 @import 'tailwindcss';
 
-/* Fonts — same families the portfolio references (JetBrains Mono + editorial display faces). */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
-
 /*
-  Paper — light editorial theme.
-  Light theme: white cards on a light-grey page, near-black ink, dashed rules.
-  The dark variant (below) is the portfolio's cream-on-near-black palette.
+  Paper — monochrome ops surfaces.
+  Black, white and greys only. Hairlines are solid. Cards are white on a grey canvas
+  so components stand out. State is carried by shape, fill, weight and icon — never hue.
 */
 :root {
-  --paper: #ffffff; /* page background: white */
-  --paper-raised: #ffffff; /* cards and surfaces */
-  --paper-sunk: #f2f2f0; /* wells, code blocks */
+  --background: #f4f4f5; /* page canvas */
+  --card: #ffffff; /* component surfaces */
+  --muted: #f4f4f5; /* wells, code, inert fills */
+  --muted-strong: #e4e4e7;
+  --border: #e4e4e7; /* hairlines */
+  --border-strong: #d4d4d8;
+  --foreground: #18181b; /* primary text */
+  --primary: #09090b; /* buttons, fills, active */
+  --primary-foreground: #fafafa;
+  --muted-foreground: #71717a;
+  --faint: #a1a1aa;
+  --ring: #09090b;
 
-  --ink: #0e100f;
-  --ink-muted: rgba(14, 16, 15, 0.6);
-  --ink-faint: rgba(14, 16, 15, 0.36);
-  --line: rgba(14, 16, 15, 0.16);
-  --line-strong: rgba(14, 16, 15, 0.34);
+  --radius: 6px;
+  --radius-lg: 8px;
 
-  --accent: #b4791f;
-  --accent-soft: rgba(180, 121, 31, 0.12);
-  --danger: #9f2f22;
-  --danger-soft: rgba(159, 47, 34, 0.1);
+  --shadow-card: 0 1px 2px rgba(9, 9, 11, 0.04), 0 1px 3px rgba(9, 9, 11, 0.06);
 
-  --highlight-amber: rgba(252, 211, 77, 0.5);
-  --highlight-rose: rgba(253, 164, 175, 0.45);
-  --highlight-sky: rgba(125, 211, 252, 0.45);
-  --highlight-lime: rgba(190, 242, 100, 0.45);
-
-  --radius: 0.75rem;
-  --radius-lg: 1rem;
-
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Text', 'Helvetica Neue', sans-serif;
   --font-display: 'Syne', var(--font-sans);
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Map the tokens to Tailwind utilities: bg-paper, text-ink, border-line, font-display, … */
+[data-theme='dark'] {
+  --background: #09090b;
+  --card: #18181b;
+  --muted: #131316;
+  --muted-strong: #27272a;
+  --border: #27272a;
+  --border-strong: #3f3f46;
+  --foreground: #fafafa;
+  --primary: #fafafa;
+  --primary-foreground: #09090b;
+  --muted-foreground: #a1a1aa;
+  --faint: #71717a;
+  --ring: #fafafa;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 @theme inline {
-  --color-paper: var(--paper);
-  --color-raised: var(--paper-raised);
-  --color-sunk: var(--paper-sunk);
-  --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
-  --color-ink-faint: var(--ink-faint);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-accent: var(--accent);
-  --color-accent-soft: var(--accent-soft);
-  --color-danger: var(--danger);
-  --color-danger-soft: var(--danger-soft);
+  --color-background: var(--background);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-strong: var(--muted-strong);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-faint: var(--faint);
+  --color-ring: var(--ring);
 
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
-  --font-serif: var(--font-serif);
   --font-mono: var(--font-mono);
 
   --radius-paper: var(--radius);
   --radius-paper-lg: var(--radius-lg);
-}
-
-/* Optional dark variant — the portfolio look, one attribute away. */
-[data-theme='dark'] {
-  --paper: #0e100f;
-  --paper-raised: #141816;
-  --paper-sunk: #0a0c0b;
-
-  --ink: #fff7dd;
-  --ink-muted: rgba(255, 247, 221, 0.66);
-  --ink-faint: rgba(255, 247, 221, 0.4);
-  --line: rgba(255, 247, 221, 0.24);
-  --line-strong: rgba(255, 247, 221, 0.45);
-
-  --accent: #e0b25c;
-  --accent-soft: rgba(224, 178, 92, 0.18);
 }
 
 @layer base {
@@ -87,17 +78,47 @@
   }
 
   body {
-    background-color: var(--paper);
-    color: var(--ink);
+    background-color: var(--background);
+    color: var(--foreground);
   }
 
   ::selection {
-    background: var(--highlight-amber);
-    color: var(--ink);
+    background: var(--foreground);
+    color: var(--card);
   }
 
   :focus-visible {
-    outline: 2px solid var(--ink);
+    outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Blocked / waiting: a monochrome hatch, the only texture in the system. */
+  .hatch {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--border-strong) 0,
+      var(--border-strong) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(-110%);
+  }
+  100% {
+    transform: translateX(320%);
   }
 }

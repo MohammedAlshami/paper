@@ -14,235 +14,264 @@ export type ComponentEntry = {
   api: { title: string; rows: ApiRow[] }[];
 };
 
+const SHARED: ApiRow[] = [
+  { prop: 'Run', type: 'object', description: 'id, workflow, workflowVersion?, status, trigger?, actor?, startedAt?, elapsed?, heartbeat?, checkpoint?, tokens?, cost?, stepsDone?, steps[]' },
+  { prop: 'RunStep', type: 'object', description: "id, name, type ('agent' | 'llm' | 'tool' | 'human'), status ('queued' | 'running' | 'done' | 'waiting' | 'failed' | 'skipped'), durationMs?, tokens?, cost?, attempt?, input?, output?, error?, meta?" },
+  { prop: 'RunStatus', type: 'union', description: "'queued' | 'running' | 'waiting' | 'paused' | 'succeeded' | 'failed' | 'cancelled'" },
+];
+
 export const COMPONENTS: ComponentEntry[] = [
+  {
+    id: 'run-header',
+    name: 'RunHeader',
+    category: 'Run control',
+    tagline: 'What is this run doing, right now.',
+    description:
+      'Workflow name and version, run state, progress bar, counters (steps, elapsed, tokens, cost, checkpoint) and the controls: pause, resume, re-run, cancel.',
+    status: 'ready',
+    file: 'components/agent-ops/run-header.tsx',
+    deps: ['lucide-react', 'internal/card', 'internal/badge', 'internal/button', 'internal/status'],
+    usage: `<RunHeader run={run} onPause={pause} onResume={resume} onRerun={rerun} onCancel={cancel} />`,
+    examples: [
+      { label: 'Waiting on a human step', code: `<RunHeader run={{ ...run, status: 'waiting' }} />` },
+      { label: 'Failed run', code: `<RunHeader run={{ ...run, status: 'failed' }} />` },
+    ],
+    api: [
+      {
+        title: 'RunHeader',
+        rows: [
+          { prop: 'run', type: 'Run', description: 'The run to display.' },
+          { prop: 'onPause / onResume', type: '() => void', description: 'Run controls.' },
+          { prop: 'onRerun / onCancel', type: '() => void', description: 'Run controls.' },
+        ],
+      },
+      { title: 'Shared types', rows: SHARED },
+    ],
+  },
   {
     id: 'run-timeline',
     name: 'RunTimeline',
-    category: 'Run control',
-    tagline: 'A long-running agent run you can see and steer.',
+    category: 'Progress',
+    tagline: "The workflow's steps, in order, with live state.",
     description:
-      'Renders a run as a timeline of steps with per-step status, a heartbeat, a checkpoint and controls to pause, resume or fork. This is the surface that dies silently in most products today.',
+      'A step list with monochrome status marks (done, running with pulse, waiting, failed, skipped), durations, retry counts, inline errors, and selection to open a step.',
     status: 'ready',
     file: 'components/agent-ops/run-timeline.tsx',
-    deps: ['lucide-react', 'internal/button', 'internal/badge', 'internal/rule'],
-    usage: `import { RunTimeline } from '@/components/agent-ops/run-timeline';
-
-const run = {
-  id: 'run_9f3a',
-  title: 'Draft chapter 3 — citation pass',
-  status: 'waiting',
-  heartbeat: '4s ago',
-  checkpoint: 'after step 3',
-  steps: [
-    { id: 'plan',  label: 'Plan the outline',        status: 'done',    meta: '1.2s · 412 tokens' },
-    { id: 'draft', label: 'Draft section',           status: 'running', meta: '2,140 tokens' },
-    { id: 'send',  label: 'Await approval: email',   status: 'waiting', meta: 'approval gate' },
-  ],
-};
-
-<RunTimeline run={run} onPause={pause} onResume={resume} />`,
+    deps: ['lucide-react', 'internal/card', 'internal/status'],
+    usage: `<RunTimeline run={run} selectedStepId={step.id} onSelectStep={setStep} />`,
     examples: [
-      { label: 'Waiting on an approval gate', code: `<RunTimeline run={{ ...run, status: 'waiting' }} />` },
-      { label: 'A step failed', code: `<RunTimeline run={{ ...run, status: 'failed' }} />` },
+      { label: 'In progress, step selected', code: `<RunTimeline run={run} selectedStepId="s4" />` },
+      { label: 'Failed and skipped steps', code: `<RunTimeline run={failedRun} />` },
     ],
     api: [
       {
         title: 'RunTimeline',
         rows: [
-          { prop: 'run', type: 'AgentRun', description: 'The run to render.' },
-          { prop: 'onPause', type: '() => void', description: 'Called when the run is paused.' },
-          { prop: 'onResume', type: '() => void', description: 'Called when a paused run is resumed.' },
-          { prop: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
-        ],
-      },
-      {
-        title: 'AgentRun · RunStep',
-        rows: [
-          { prop: 'id, title, status', type: 'string · RunStatus', description: "'running' | 'succeeded' | 'failed' | 'paused' | 'waiting'." },
-          { prop: 'heartbeat, checkpoint', type: 'string', description: 'Shown in the header and footer.' },
-          { prop: 'steps', type: 'RunStep[]', description: "Each step: id, label, status ('done' | 'running' | 'waiting' | 'failed' | 'pending'), meta, at." },
+          { prop: 'run', type: 'Run', description: 'Steps render in array order.' },
+          { prop: 'selectedStepId', type: 'string', description: 'Highlights the active row.' },
+          { prop: 'onSelectStep', type: '(step: RunStep) => void', description: 'Called when a row is clicked.' },
         ],
       },
     ],
   },
   {
-    id: 'approval-gate',
-    name: 'ApprovalGate',
-    category: 'Human in the loop',
-    tagline: 'Consent before the side effect, not after.',
+    id: 'step-detail',
+    name: 'StepDetail',
+    category: 'Inspecting',
+    tagline: 'Everything about one step.',
     description:
-      'Pauses a run and shows exactly what is about to happen — the tool, the arguments, the risk and the reason — with approve, reject and edit. Designed to sit before a tool call, not as an "Approve" button at the end.',
+      'Opens a step: type, attempt, duration, tokens, cost, the input and output payloads in wells, any error, and the actions — retry, skip, edit input, copy payload.',
     status: 'ready',
-    file: 'components/agent-ops/approval-gate.tsx',
-    deps: ['lucide-react', 'internal/button', 'internal/badge', 'internal/eyebrow'],
-    usage: `import { ApprovalGate } from '@/components/agent-ops/approval-gate';
-
-<ApprovalGate
-  request={{
-    id: 'ap_4412',
-    action: 'Send email to 3 recipients',
-    tool: 'mail.send',
-    risk: 'medium',
-    reason: 'The draft is finished. Sending cannot be undone.',
-    expiresIn: 'expires in 9m',
-    args: '{\\n  "to": ["sara@example.com"],\\n  "subject": "Chapter 3 — draft"\\n}',
-  }}
-  onApprove={approve}
-  onReject={reject}
-/>`,
+    file: 'components/agent-ops/step-detail.tsx',
+    deps: ['lucide-react', 'internal/card', 'internal/badge', 'internal/button', 'internal/status'],
+    usage: `<StepDetail step={step} onRetry={retry} onSkip={skip} />`,
     examples: [
-      { label: 'Medium risk — sending email', code: `<ApprovalGate request={emailRequest} />` },
-      { label: 'High risk — destructive tool', code: `<ApprovalGate request={{ ...req, tool: 'db.delete_rows', risk: 'high' }} />` },
+      { label: 'Tool step that was retried', code: `<StepDetail step={retriedStep} />` },
+      { label: 'Failed step with an error', code: `<StepDetail step={failedStep} />` },
     ],
     api: [
       {
-        title: 'ApprovalGate',
+        title: 'StepDetail',
         rows: [
-          { prop: 'request', type: 'ApprovalRequest', description: 'What is being approved.' },
-          { prop: 'onApprove', type: '() => void', description: 'Run the tool call.' },
-          { prop: 'onReject', type: '() => void', description: 'Cancel the tool call and continue the run.' },
-          { prop: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
-        ],
-      },
-      {
-        title: 'ApprovalRequest',
-        rows: [
-          { prop: 'action', type: 'string', description: 'One line describing the side effect.' },
-          { prop: 'tool', type: 'string', description: 'Tool name, shown in mono.' },
-          { prop: 'args', type: 'string', description: 'Pretty-printed JSON of the arguments.' },
-          { prop: 'risk', type: "'low' | 'medium' | 'high'", description: 'Drives the badge.' },
-          { prop: 'reason, requestedBy, expiresIn', type: 'string', description: 'Optional context lines.' },
+          { prop: 'step', type: 'RunStep', description: 'When omitted, renders the empty prompt.' },
+          { prop: 'onRetry / onSkip', type: '() => void', description: 'Step-level actions.' },
         ],
       },
     ],
   },
   {
-    id: 'trace-inspector',
-    name: 'TraceInspector',
-    category: 'Observability',
-    tagline: 'Spans and tool calls, inside your app.',
+    id: 'event-stream',
+    name: 'EventStream',
+    category: 'Tracking',
+    tagline: "The run's live log.",
     description:
-      'An embeddable span viewer with OTel-shaped props: duration bars, tokens and cost per span, and expandable input/output. Today this only exists inside monolithic observability platforms.',
+      'A monospace event feed with level filters (info, warn, error) and a follow tail. Token spend, retries, approvals and failures all land here in order.',
     status: 'ready',
-    file: 'components/agent-ops/trace-inspector.tsx',
-    deps: ['lucide-react', 'internal/badge', 'internal/rule', 'internal/eyebrow'],
-    usage: `import { TraceInspector } from '@/components/agent-ops/trace-inspector';
-
-<TraceInspector
-  spans={[
-    { id: 's1', name: 'agent.run',           kind: 'agent', durationMs: 18420, input: '{ "goal": "draft chapter 3" }' },
-    { id: 's2', name: 'llm.complete · plan', kind: 'llm',   durationMs: 1180, tokens: 412,  cost: 0.0012 },
-    { id: 's3', name: 'tool.references_search', kind: 'tool', durationMs: 84, cost: 0.0015, input: '{ "q": "marketing" }' },
-  ]}
-/>`,
-    examples: [
-      { label: 'Mixed spans with an error', code: `<TraceInspector spans={spans} currency="$" />` },
-      { label: 'Retrieval-only trace', code: `<TraceInspector spans={spans.filter((s) => s.kind === 'retrieval')} />` },
-    ],
+    file: 'components/agent-ops/event-stream.tsx',
+    deps: ['lucide-react', 'internal/card'],
+    usage: `<EventStream events={events} />`,
+    examples: [{ label: 'Live run', code: `<EventStream events={events} />` }],
     api: [
       {
-        title: 'TraceInspector',
+        title: 'EventStream · RunEvent',
         rows: [
-          { prop: 'spans', type: 'Span[]', description: 'Tree is flattened; order is render order.' },
-          { prop: 'currency', type: 'string', default: "'$'", description: 'Prefix for the cost figures.' },
-          { prop: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
-        ],
-      },
-      {
-        title: 'Span',
-        rows: [
-          { prop: 'name, kind', type: 'string · SpanKind', description: "'agent' | 'llm' | 'tool' | 'retrieval' — sets the dot colour." },
-          { prop: 'durationMs', type: 'number', description: 'Drives the relative duration bar.' },
-          { prop: 'tokens, cost', type: 'number', description: 'Shown per span and summed in the header.' },
-          { prop: 'input, output', type: 'string', description: 'Revealed when the row is expanded.' },
-          { prop: 'status', type: "'ok' | 'error'", description: 'Flags failing spans.' },
+          { prop: 'events', type: 'RunEvent[]', description: 'Rendered in array order, oldest first.' },
+          { prop: 'levels / follow', type: 'internal state', description: "Filters are 'info' | 'warn' | 'error'; follow pins the scroller to the newest event." },
+          { prop: 'ts, type, message, stepId?', type: 'string', description: 'One event row.' },
         ],
       },
     ],
   },
   {
-    id: 'cost-meter',
-    name: 'CostMeter',
-    category: 'Budgets',
-    tagline: 'Token and cost budgets as an interface.',
+    id: 'replay-scrubber',
+    name: 'ReplayScrubber',
+    category: 'Replay',
+    tagline: 'Scrub through a finished run.',
     description:
-      'Spent versus budget, a burn rate, an eight-hour projection and a pause control — with a plain-English warning when the run is going to overspend. Solved at the gateway layer today, absent as a React surface.',
-    status: 'ready',
-    file: 'components/agent-ops/cost-meter.tsx',
-    deps: ['lucide-react', 'internal/button', 'internal/badge', 'internal/eyebrow'],
-    usage: `import { CostMeter } from '@/components/agent-ops/cost-meter';
-
-<CostMeter spent={18.42} budget={25} burnPerHour={3.1} hoursElapsed={6} onPause={pause} />`,
-    examples: [
-      { label: 'On track', code: `<CostMeter spent={8.2} budget={25} burnPerHour={1.1} hoursElapsed={3} />` },
-      { label: 'Over budget', code: `<CostMeter spent={27.9} budget={25} burnPerHour={4.2} hoursElapsed={7} />` },
-    ],
-    api: [
-      {
-        title: 'CostMeter',
-        rows: [
-          { prop: 'spent, budget', type: 'number', description: 'Amounts, in the same currency.' },
-          { prop: 'currency', type: 'string', default: "'$'", description: 'Rendered before every figure.' },
-          { prop: 'burnPerHour', type: 'number', description: 'Drives the projection and the warning.' },
-          { prop: 'hoursElapsed', type: 'number', default: '1', description: 'Shown as the elapsed figure.' },
-          { prop: 'onPause', type: '() => void', description: 'Called by "Pause agent".' },
-          { prop: 'label', type: 'string', default: "'Run budget'", description: 'Eyebrow text.' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'mcp-catalog',
-    name: 'MCPCatalog',
-    category: 'Tools',
-    tagline: 'Connect MCP servers and consent to their tools.',
-    description:
-      'The Model Context Protocol surface: server list with transport and auth, a connect → authenticate → consent flow, per-tool toggles and honest error states. Only one other library ships a partial answer.',
+      'A transport for a completed run: play/pause, step forward and back, speed, and a scrubber that walks the timeline. The current step is named, with its mark and timestamp.',
     status: 'new',
-    file: 'components/agent-ops/mcp-catalog.tsx',
-    deps: ['lucide-react', 'internal/button', 'internal/badge', 'internal/eyebrow'],
-    usage: `import { MCPCatalog } from '@/components/agent-ops/mcp-catalog';
+    file: 'components/agent-ops/replay-scrubber.tsx',
+    deps: ['lucide-react', 'internal/card', 'internal/status'],
+    usage: `const [index, setIndex] = React.useState(0);
 
-<MCPCatalog
-  servers={[
-    {
-      id: 'openabstracts',
-      name: 'OpenAbstracts',
-      url: 'https://openabstracts.com/mcp',
-      transport: 'http',
-      auth: 'apiKey',
-      status: 'connected',
-      tools: [
-        { name: 'references_search', description: 'Search 10M+ papers.' },
-        { name: 'citation_verify', description: 'Check a citation exists.', readOnly: true },
-      ],
-    },
-    { id: 'gdrive', name: 'Google Drive', url: 'https://mcp.gdrive.example/v1', auth: 'oauth', status: 'needs-auth' },
-  ]}
-  onConnect={connect}
+<ReplayScrubber
+  run={run}
+  index={index}
+  onChange={setIndex}
+  playing={playing}
+  onTogglePlay={() => setPlaying(!playing)}
+  speed={speed}
+  onSpeedChange={setSpeed}
 />`,
     examples: [
-      { label: 'Connected, needs-auth and error', code: `<MCPCatalog servers={servers} />` },
-      { label: 'Nothing connected yet', code: `<MCPCatalog servers={[]} />` },
+      { label: 'Mid-run', code: `<ReplayScrubber run={run} index={3} onChange={setIndex} />` },
+      { label: 'At the end, 4× speed', code: `<ReplayScrubber run={run} index={5} onChange={setIndex} speed={4} />` },
     ],
     api: [
       {
-        title: 'MCPCatalog',
+        title: 'ReplayScrubber',
         rows: [
-          { prop: 'servers', type: 'McpServer[]', description: 'One row per server.' },
-          { prop: 'onConnect', type: '(server) => void', description: 'Start the connect / OAuth flow.' },
-          { prop: 'onDisconnect', type: '(server) => void', description: 'Revoke and disconnect.' },
-          { prop: 'onAdd', type: '() => void', description: 'Opens your add-server flow.' },
+          { prop: 'run', type: 'Run', description: 'The finished run to replay.' },
+          { prop: 'index / onChange', type: 'number · (n) => void', description: 'Controlled step position.' },
+          { prop: 'playing / onTogglePlay', type: 'boolean · () => void', description: 'Playback state.' },
+          { prop: 'speed / onSpeedChange', type: '1 | 2 | 4', description: 'Playback speed.' },
         ],
       },
+    ],
+  },
+  {
+    id: 'fork-panel',
+    name: 'ForkPanel',
+    category: 'Branching',
+    tagline: 'Branch a run from any step.',
+    description:
+      'Reuses everything before the chosen step, lets you edit that step’s input, names the branch, and shows the lineage. The original run is never touched.',
+    status: 'new',
+    file: 'components/agent-ops/fork-panel.tsx',
+    deps: ['lucide-react', 'internal/card', 'internal/button'],
+    usage: `<ForkPanel run={run} step={step} onFork={({ branch, input }) => forkRun(run, step, input, branch)} />`,
+    examples: [{ label: 'Fork from a tool step', code: `<ForkPanel run={run} step={step} onFork={fork} />` }],
+    api: [
       {
-        title: 'McpServer · McpTool',
+        title: 'ForkPanel',
         rows: [
-          { prop: 'url, transport', type: 'string · McpTransport', description: "'http' | 'sse' | 'stdio'." },
-          { prop: 'auth', type: 'McpAuth', description: "'none' | 'oauth' | 'apiKey' — drives the chip and the consent copy." },
-          { prop: 'status', type: 'McpStatus', description: "'connected' | 'needs-auth' | 'error' | 'disconnected'." },
-          { prop: 'tools[].allowed', type: 'boolean', default: 'true', description: 'Per-tool consent, toggled in the UI.' },
-          { prop: 'tools[].readOnly', type: 'boolean', description: 'Renders a locked read-only toggle.' },
+          { prop: 'run', type: 'Run', description: 'Parent run.' },
+          { prop: 'step', type: 'RunStep', description: 'The step to branch from; its input pre-fills the editor.' },
+          { prop: 'onFork', type: '({ branch, input }) => void', description: 'Called with the branch name and edited input.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'branch-compare',
+    name: 'BranchCompare',
+    category: 'Branching',
+    tagline: 'Parent vs fork, step by step.',
+    description:
+      'Two columns over the same steps with per-step deltas for duration and tokens, plus the totals — so you can see whether the change actually helped.',
+    status: 'new',
+    file: 'components/agent-ops/branch-compare.tsx',
+    deps: ['internal/card', 'internal/badge', 'internal/status'],
+    usage: `<BranchCompare parent={parentRun} branch={branchRun} />`,
+    examples: [{ label: 'Parent vs branch', code: `<BranchCompare parent={parentRun} branch={branchRun} />` }],
+    api: [
+      {
+        title: 'BranchCompare',
+        rows: [
+          { prop: 'parent', type: 'Run', description: 'The original run.' },
+          { prop: 'branch', type: 'Run', description: 'The forked run; steps are paired by index.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'runs-table',
+    name: 'RunsTable',
+    category: 'Management',
+    tagline: 'The index of every run.',
+    description:
+      'Status, workflow, run id, trigger, step progress, duration, cost and start time — filterable by status, with per-row re-run and cancel.',
+    status: 'ready',
+    file: 'components/agent-ops/runs-table.tsx',
+    deps: ['lucide-react', 'internal/card', 'internal/status'],
+    usage: `<RunsTable runs={runs} onSelect={openRun} onRerun={rerun} onCancel={cancel} />`,
+    examples: [{ label: 'All runs', code: `<RunsTable runs={runs} onSelect={openRun} />` }],
+    api: [
+      {
+        title: 'RunsTable · RunSummary',
+        rows: [
+          { prop: 'runs', type: 'RunSummary[]', description: 'id, workflow, status, trigger?, actor?, startedAt?, durationMs?, cost?, stepsDone?, stepsTotal?' },
+          { prop: 'onSelect / onRerun / onCancel', type: '(run) => void', description: 'Row interactions.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'run-metrics',
+    name: 'RunMetrics',
+    category: 'Management',
+    tagline: 'Are the workflows healthy.',
+    description:
+      'KPI tiles (success rate, p95 duration, cost per run, retry rate), a fourteen-day runs chart drawn in greyscale, and the failure reasons as hatched bars with counts.',
+    status: 'new',
+    file: 'components/agent-ops/run-metrics.tsx',
+    deps: ['internal/card'],
+    usage: `<RunMetrics workflow="All workflows" window="Last 14 days" kpis={kpis} trend={trend} failures={failures} />`,
+    examples: [{ label: 'Fourteen days', code: `<RunMetrics kpis={kpis} trend={trend} failures={failures} />` }],
+    api: [
+      {
+        title: 'RunMetrics',
+        rows: [
+          { prop: 'kpis', type: 'Kpi[]', description: 'label, value, hint?, delta? — rendered as tiles.' },
+          { prop: 'trend', type: 'TrendPoint[]', description: 'label, value, failed? — bars; failed days render in the hatch tone.' },
+          { prop: 'failures', type: '{ reason, count }[]', description: 'Hatched bars, longest first.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'approval-step',
+    name: 'ApprovalStep',
+    category: 'Human in the loop',
+    tagline: 'Consent before the side effect.',
+    description:
+      'A human step inside the workflow: the action, the tool, the arguments shown in full, the risk and the reason — approve, reject or edit before anything runs.',
+    status: 'ready',
+    file: 'components/agent-ops/approval-step.tsx',
+    deps: ['lucide-react', 'internal/card', 'internal/badge', 'internal/button', 'internal/eyebrow'],
+    usage: `<ApprovalStep request={request} onApprove={approve} onReject={reject} />`,
+    examples: [
+      { label: 'Medium risk — sending email', code: `<ApprovalStep request={emailRequest} />` },
+      { label: 'High risk — destructive tool', code: `<ApprovalStep request={{ ...req, risk: 'high' }} />` },
+    ],
+    api: [
+      {
+        title: 'ApprovalStep · ApprovalRequest',
+        rows: [
+          { prop: 'action, tool, args', type: 'string', description: 'What will happen, and the exact arguments.' },
+          { prop: 'risk', type: "'low' | 'medium' | 'high'", description: 'Shown as a badge and severity text.' },
+          { prop: 'reason?, requestedBy?, expiresIn?', type: 'string', description: 'Optional context.' },
+          { prop: 'onApprove / onReject', type: '() => void', description: 'Decision handlers.' },
         ],
       },
     ],
@@ -252,6 +281,7 @@ const run = {
 export const getComponent = (id: string) => COMPONENTS.find((c) => c.id === id);
 
 export const PLANNED = [
-  { name: 'BrowserUse', note: 'Watch the agent drive a browser — viewport frames, click highlights, action log.' },
+  { name: 'BrowserUse', note: 'Watch the agent drive a browser — frames, click highlights, action log.' },
   { name: 'MemoryBrowser', note: 'Browse and edit what the agent remembers, with provenance.' },
+  { name: 'WorkflowGraph', note: 'The workflow as a node graph, with live state per node.' },
 ];

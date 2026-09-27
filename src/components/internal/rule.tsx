@@ -1,17 +1,9 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export interface RuleProps extends React.HTMLAttributes<HTMLDivElement> {
-  dashed?: boolean;
-}
+export interface RuleProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-/** The signature hairline: a dashed rule, used as the section separator everywhere. */
-export function Rule({ className, dashed = true, ...props }: RuleProps) {
-  return (
-    <div
-      role="separator"
-      className={cn('h-px w-full border-t', dashed ? 'border-dashed' : 'border-solid', 'border-line', className)}
-      {...props}
-    />
-  );
+/** The one hairline: solid, 1px, borders only where separation is needed. */
+export function Rule({ className, ...props }: RuleProps) {
+  return <div role="separator" className={cn('h-px w-full bg-border', className)} {...props} />;
 }
