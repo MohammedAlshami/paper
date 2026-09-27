@@ -11,9 +11,9 @@
   The dark variant (below) is the portfolio's cream-on-near-black palette.
 */
 :root {
-  --paper: #f6f6f4; /* page background: light grey */
-  --paper-raised: #ffffff; /* cards and surfaces: white */
-  --paper-sunk: #eceae6; /* wells, code blocks */
+  --paper: #ffffff; /* page background: white */
+  --paper-raised: #ffffff; /* cards and surfaces */
+  --paper-sunk: #f2f2f0; /* wells, code blocks */
 
   --ink: #0e100f;
   --ink-muted: rgba(14, 16, 15, 0.6);

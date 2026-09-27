@@ -1,6 +1,6 @@
 # Paper — a light editorial React UI kit
 
-Copy-paste React components with an editorial, illustrated light theme: **white and light-grey surfaces, near-black ink, dashed rules, line-art illustrations.** No package to install, no version to chase — you copy the component file into your project and own it.
+Copy-paste React components with an editorial, illustrated light theme: **white surfaces, near-black ink, dashed rules, line-art illustrations.** No package to install, no version to chase — you copy the component file into your project and own it.
 
 Everything inherits from a handful of CSS variables, so the **dark editorial variant** (the near-black/cream palette) is one attribute away.
 
@@ -60,8 +60,9 @@ Swap them for your own art by editing one map — the keys stay the same.
 
 ```css
 :root {
-  --paper: #f6f6f4;        /* page: light grey */
+  --paper: #ffffff;        /* page: white */
   --paper-raised: #ffffff; /* cards: white */
+  --paper-sunk: #f2f2f0;   /* wells, code */
   --ink: #0e100f;
 }
 [data-theme='dark'] { --paper: #0e100f; --paper-raised: #141816; --ink: #fff7dd; }

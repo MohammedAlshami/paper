@@ -159,7 +159,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-paper text-ink">
       {/* Top bar */}
-      <header className="sticky top-0 z-50 border-b border-dashed border-line bg-paper/85 backdrop-blur">
+      <header className="sticky top-0 z-50 bg-paper/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-5">
           <a href="#start" className="flex items-center gap-2.5">
             <span className="grid size-7 place-items-center rounded-md bg-ink font-mono text-[13px] font-medium text-paper">
@@ -168,19 +168,9 @@ export default function App() {
             <span className="font-display text-base font-bold tracking-tight">Paper</span>
             <Badge tone="faint">v0.1</Badge>
           </a>
-          <span className="hidden text-xs text-ink-faint sm:block">
-            a light editorial React UI kit · copy, paste, own
-          </span>
           <div className="ml-auto flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
               {theme === 'light' ? 'Dark' : 'Light'} theme
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => document.getElementById('start')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Get started <ChevronRight className="size-4" />
             </Button>
           </div>
         </div>
@@ -216,10 +206,9 @@ export default function App() {
               An editorial interface kit for people who care how it looks.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-relaxed text-ink-muted">
-              Paper is a light, illustrated component set: white and light-grey surfaces, near-black ink,
-              dashed rules and line-art illustrations. You copy the components into your project and own
-              them — there is no runtime package, no version to chase, and every token is a CSS variable you
-              can rewrite.
+              Paper is a light, illustrated component set: white surfaces, near-black ink, dashed rules and
+              line-art illustrations. You copy the components into your project and own them — there is no
+              runtime package, no version to chase, and every token is a CSS variable you can rewrite.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button

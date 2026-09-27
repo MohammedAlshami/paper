@@ -6,10 +6,10 @@ type Size = 'sm' | 'md' | 'lg' | 'icon';
 
 const variants: Record<Variant, string> = {
   solid: 'bg-ink text-paper hover:opacity-90',
-  outline: 'border border-dashed border-line-strong text-ink hover:bg-ink/[0.04]',
+  outline: 'border border-line-strong text-ink hover:bg-ink/[0.04]',
   ghost: 'text-ink-muted hover:bg-ink/[0.05] hover:text-ink',
   accent: 'bg-accent text-white hover:opacity-90',
-  link: 'text-ink underline decoration-dashed underline-offset-4 hover:decoration-solid',
+  link: 'text-ink underline underline-offset-4 hover:opacity-70',
 };
 
 const sizes: Record<Size, string> = {
