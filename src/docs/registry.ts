@@ -1,4 +1,5 @@
 import type { ApiRow, ApiSection } from './md';
+import { FLEET_COMPONENTS } from './registry-fleet';
 
 
 export type ComponentEntry = {
@@ -1381,6 +1382,7 @@ Shipping from <LocationBadge city="Lisbon" country="PT" position={position} />`,
       },
     ],
   },
+  ...FLEET_COMPONENTS,
 ];
 
 export const getComponent = (id: string) => COMPONENTS.find((entry) => entry.id === id);

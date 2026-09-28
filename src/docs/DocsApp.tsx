@@ -21,8 +21,7 @@ import {
   SubtitleLink,
 } from './md';
 import { COMPONENTS, getComponent, type ComponentEntry } from './registry';
-import { getSource } from './source';
-import { EXAMPLES, PREVIEWS } from './previews';
+import { loadSource, localImportFiles } from './source';
 
 /* ============================================================================
    navigation
@@ -39,6 +38,12 @@ const SIDEBAR_COMPONENT_GROUPS: { heading: string; ids: string[] }[] = [
   { heading: 'Fleet and operations', ids: ['fleet-overview', 'vehicle-detail-panel', 'dispatch-board', 'route-optimizer-result', 'geofence-alert-feed'] },
   { heading: 'Data visualisation', ids: ['region-choropleth', 'origin-destination-flow', 'heatmap-card', 'coverage-map', 'trip-replay'] },
   { heading: 'Travel and real estate', ids: ['trip-summary-card', 'itinerary-map', 'property-map-card', 'commute-calculator', 'weather-alert-map'] },
+  { heading: 'Vehicle health and records', ids: ['vehicle-health-card', 'vehicle-spec-sheet', 'vehicle-timeline', 'diagnostic-code-list', 'document-expiry-tracker'] },
+  { heading: 'Maintenance scheduling', ids: ['service-due-list', 'maintenance-calendar', 'pm-schedule-builder', 'service-interval-gauge', 'downtime-forecast'] },
+  { heading: 'Work orders and repairs', ids: ['work-order-card', 'work-order-board', 'inspection-checklist', 'defect-report-form', 'repair-estimate-table'] },
+  { heading: 'Parts and inventory', ids: ['parts-inventory-table', 'stock-level-bar', 'reorder-suggestions', 'parts-usage-chart', 'part-detail-panel', 'purchase-order-card'] },
+  { heading: 'Tyres, fuel and fluids', ids: ['tire-status-grid', 'fuel-economy-trend', 'fluids-battery-panel', 'fuel-transaction-list'] },
+  { heading: 'Fleet costs and stats', ids: ['fleet-kpi-strip', 'cost-breakdown-chart', 'utilization-grid', 'vehicle-leaderboard', 'replacement-planner'] },
 ];
 
 const COMPONENT_NAV_GROUPS: NavGroup[] = SIDEBAR_COMPONENT_GROUPS.map(({ heading, ids }) => ({
@@ -71,6 +76,62 @@ const NAV: NavGroup[] = [
 ];
 
 const REPO = 'https://github.com/MohammedAlshami/paper';
+
+/**
+ * The live previews pull in MapLibre or Recharts plus every component, so they load on demand, one chunk per
+ * family: the docs shell and the components grid never pay for them, and a fleet page never downloads MapLibre.
+ */
+type Family = 'maps' | 'fleet';
+type PreviewModule = { PREVIEWS: Record<string, React.ReactNode>; EXAMPLES: Record<string, { label: string; node: React.ReactNode }[]> };
+const previewCache: Partial<Record<Family, PreviewModule>> = {};
+
+const familyOf = (file: string): Family => (file.startsWith('components/fleet/') ? 'fleet' : 'maps');
+
+function loadPreviews(family: Family): Promise<PreviewModule> {
+  return family === 'fleet'
+    ? import('./previews-fleet').then((loaded) => ({ PREVIEWS: loaded.FLEET_PREVIEWS, EXAMPLES: loaded.FLEET_EXAMPLES }))
+    : import('./previews').then((loaded) => ({ PREVIEWS: loaded.PREVIEWS, EXAMPLES: loaded.EXAMPLES }));
+}
+
+function usePreviews(family: Family = 'maps') {
+  const [module, setModule] = React.useState<PreviewModule | null>(previewCache[family] ?? null);
+  React.useEffect(() => {
+    if (previewCache[family]) return setModule(previewCache[family]);
+    let live = true;
+    setModule(null);
+    void loadPreviews(family).then((loaded) => {
+      previewCache[family] = loaded;
+      if (live) setModule(loaded);
+    });
+    return () => {
+      live = false;
+    };
+  }, [family]);
+  return module;
+}
+
+/** A component's source text, or null while it loads. */
+function useSource(file: string) {
+  const [source, setSource] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    let live = true;
+    setSource(null);
+    void loadSource(file).then((text) => live && setSource(text));
+    return () => {
+      live = false;
+    };
+  }, [file]);
+  return source;
+}
+
+function PreviewFallback() {
+  return (
+    <div className="flex min-h-40 w-full items-center justify-center text-sm text-muted-foreground" role="status">
+      Loading preview
+    </div>
+  );
+}
+
 
 /* ============================================================================
    routing — real paths (pushState), not hash fragments
@@ -510,6 +571,7 @@ function QuickNav({ title, items }: { title: string; items: QuickNavItem[] }) {
 
 function QuickStartPage() {
   const tracker = getComponent('delivery-tracker-card');
+  const previews = usePreviews();
   return (
     <>
       <MdH1 id="quick-start">Quick start</MdH1>
@@ -526,12 +588,13 @@ function QuickStartPage() {
           </SubtitleLink>
         }
       >
-        React components for maps and logistics.
+        React components for maps and fleet operations.
       </Subtitle>
 
       <MdP>
-        Paper is a set of finished, product-facing components where a map is the visual: a delivery tracker, a store
-        locator, a dispatch board. They are the screens you would otherwise build from scratch on top of a map library.
+        Paper is a set of finished, product-facing components for running a fleet. Some put a map front and centre (a
+        delivery tracker, a store locator, a dispatch board); the rest cover the workshop and the office (work orders,
+        service schedules, parts, fuel, running costs). They are the screens you would otherwise build from scratch.
       </MdP>
 
       <MdP>
@@ -543,11 +606,15 @@ function QuickStartPage() {
         <Link href="https://maplibre.org/" arrow>
           MapLibre GL
         </Link>
-        , which is open source and needs no API key.
+        , which is open source and needs no API key, and the charts on{' '}
+        <Link href="https://recharts.org/" arrow>
+          Recharts
+        </Link>
+        .
       </MdP>
 
       <Demo code={tracker?.usage} file="delivery-tracker-card.tsx">
-        {PREVIEWS['delivery-tracker-card']}
+        {previews ? previews.PREVIEWS['delivery-tracker-card'] : <PreviewFallback />}
       </Demo>
 
       <MdH2 id="how-it-works">How it works</MdH2>
@@ -568,6 +635,7 @@ function QuickStartPage() {
 }
 
 function InstallationPage() {
+  const mapKit = useSource('components/maps/map-kit.tsx');
   return (
     <>
       <MdH1 id="installation">Installation</MdH1>
@@ -591,13 +659,21 @@ cp src/components/maps/map-kit.tsx ./src/components/maps/
 cp src/components/maps/store-locator.tsx ./src/components/maps/`}
       />
 
+      <MdH2 id="fleet-components">Fleet maintenance components</MdH2>
+      <MdP>
+        The fleet components need no map. They import <Code>lucide-react</Code>, and the ones that draw charts also import{' '}
+        <Code>recharts</Code>. Each folder has one small shared file, <Code>fleet-kit.ts</Code> (date, number and money
+        formatting), so copy that once next to the components you take from <Code>src/components/fleet</Code>.
+      </MdP>
+      <InstallBlock packages="recharts lucide-react clsx tailwind-merge" />
+
       <MdH2 id="set-up-the-map">Set up the map</MdH2>
       <MdP>
         <Code>map-kit.tsx</Code> holds everything MapLibre needs: the <Code>useMap</Code> hook, the <Code>MapCanvas</Code>{' '}
         element, the <Code>MapMarker</Code> component and a few geometry helpers. It imports MapLibre&apos;s stylesheet and
         points MapLibre at its web worker; the worker line is the Vite form, so other bundlers need their own equivalent.
       </MdP>
-      <CodeBlock file="map-kit.tsx" code={getSource('components/maps/map-kit.tsx')} />
+      <CodeBlock file="map-kit.tsx" code={mapKit ?? '// Loading the source'} />
       <MdP>
         The default map style is OpenFreeMap&apos;s <Code>positron</Code>, which needs no key. Pass any MapLibre style URL
         or object as <Code>mapStyle</Code> to use your own tiles.
@@ -635,9 +711,9 @@ cp src/components/maps/store-locator.tsx ./src/components/maps/`}
           components available at <Code>@/components/ui</Code>.
         </MdLi>
         <MdLi>
-          <Code>maplibre-gl</Code> and <Code>lucide-react</Code>.
+          <Code>lucide-react</Code>, plus <Code>maplibre-gl</Code> for the map components or <Code>recharts</Code> for the fleet charts.
         </MdLi>
-        <MdLi>A network connection to a tile server. The default is OpenFreeMap.</MdLi>
+        <MdLi>A network connection to a tile server for the map components. The default is OpenFreeMap.</MdLi>
       </MdUl>
     </>
   );
@@ -781,7 +857,10 @@ const COMPONENT_SECTIONS: QuickNavItem[] = [
 
 function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string }) {
   void route;
-  const examples = EXAMPLES[entry.id] ?? [];
+  const previews = usePreviews(familyOf(entry.file));
+  const source = useSource(entry.file);
+  const imports = source ? localImportFiles(entry.file, source) : [];
+  const examples = previews?.EXAMPLES[entry.id] ?? [];
   return (
     <>
       <MdH1 id={entry.id}>{entry.name}</MdH1>
@@ -804,7 +883,7 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
       <MdP>{entry.description}</MdP>
 
       <Demo code={entry.usage} file={`${entry.id}.tsx`} wide={entry.wide}>
-        {PREVIEWS[entry.id]}
+        {previews ? previews.PREVIEWS[entry.id] : <PreviewFallback />}
       </Demo>
 
       <MdH2 id="installation">Installation</MdH2>
@@ -821,10 +900,23 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
           <InstallBlock packages={entry.deps.join(' ')} />
         </>
       ) : null}
-      {entry.file.startsWith('components/maps/') ? (
+      {imports.length ? (
         <MdP>
-          It also imports the shared map helpers from <Code>src/components/maps/map-kit.tsx</Code>. Copy that file once and
-          every map component can use it; see <Link href="/installation">Installation</Link> for the map setup.
+          It also imports{' '}
+          {imports.map((name, index, all) => (
+            <React.Fragment key={name}>
+              {index > 0 ? (index === all.length - 1 ? ' and ' : ', ') : ''}
+              <Code>{name}</Code>
+            </React.Fragment>
+          ))}{' '}
+          from the same folder. Copy {imports.length === 1 ? 'that file' : 'those files'} too
+          {entry.file.startsWith('components/maps/') ? (
+            <>
+              ; see <Link href="/installation">Installation</Link> for the map setup.
+            </>
+          ) : (
+            '.'
+          )}
         </MdP>
       ) : null}
 
@@ -832,7 +924,7 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
       <MdP>
         The full, real file — this is what you paste. Anything shorter than this is a usage example, not the component.
       </MdP>
-      <CodeBlock file={entry.file.split('/').pop()} code={getSource(entry.file)} />
+      <CodeBlock file={entry.file.split('/').pop()} code={source ?? '// Loading the source'} />
 
       <MdH2 id="usage">Usage</MdH2>
       <CodeBlock code={entry.usage} />
@@ -864,7 +956,7 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
 const PITCHES = [
   {
     title: 'Finished, not plumbing',
-    body: 'A delivery tracker, a store locator, a dispatch board: whole screens with a map in them, not another map wrapper.',
+    body: 'A delivery tracker, a work order board, a parts inventory: whole screens for a real workflow, not another set of primitives.',
     illustration: '/illustrations/project-development.svg',
   },
   {
@@ -873,13 +965,13 @@ const PITCHES = [
     illustration: '/illustrations/puzzle.svg',
   },
   {
-    title: 'An open map stack',
-    body: 'MapLibre GL and OpenFreeMap tiles: open source, no API key, no per-load billing.',
+    title: 'Open by default',
+    body: 'MapLibre GL and OpenFreeMap for the maps, Recharts for the charts: open source, no API keys, no per-load billing.',
     illustration: '/illustrations/target-accent.svg',
   },
 ];
 
-const FEATURED_IDS = ['delivery-tracker-card', 'store-locator', 'fleet-overview', 'region-choropleth'];
+const FEATURED_IDS = ['delivery-tracker-card', 'work-order-board', 'fleet-overview', 'cost-breakdown-chart'];
 
 function ComponentCard({ id }: { id: string }) {
   const entry = getComponent(id);
@@ -901,6 +993,7 @@ function ComponentCard({ id }: { id: string }) {
 }
 
 function LandingPage() {
+  const previews = usePreviews();
   return (
     <div className="flex flex-col gap-20 py-8 sm:py-12">
       <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto]">
@@ -911,12 +1004,12 @@ function LandingPage() {
           </span>
 
           <h1 className="max-w-3xl text-4xl font-medium tracking-tight text-foreground sm:text-6xl">
-            React components for maps and logistics.
+            React components for maps and fleet operations.
           </h1>
 
           <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Delivery tracking, store locators, fleet dashboards, route planning. The finished screens you would otherwise
-            build from scratch around a map, as components you copy into your project.
+            Delivery tracking and store locators on a map, and the fleet side too: maintenance schedules, work orders,
+            parts inventory, running costs. Finished screens you copy into your project.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -934,7 +1027,7 @@ function LandingPage() {
           </div>
         </div>
 
-        <div className="hidden lg:block">{PREVIEWS['delivery-tracker-card']}</div>
+        <div className="hidden min-h-[36rem] w-[26rem] lg:block">{previews ? previews.PREVIEWS['delivery-tracker-card'] : null}</div>
       </section>
 
       <section className="grid grid-cols-1 gap-10 border-y border-border py-10 sm:grid-cols-3">
@@ -965,6 +1058,9 @@ function LandingPage() {
 }
 
 function ComponentsIndexPage() {
+  const [family, setFamily] = React.useState<'all' | 'maps' | 'fleet'>('all');
+  const shown = COMPONENTS.filter((entry) => family === 'all' || entry.file.startsWith(`components/${family}/`));
+  const counts = { all: COMPONENTS.length, maps: COMPONENTS.filter((entry) => entry.file.startsWith('components/maps/')).length, fleet: COMPONENTS.filter((entry) => entry.file.startsWith('components/fleet/')).length };
   return (
     <div className="flex flex-col gap-12 py-8 sm:py-12">
       <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
@@ -981,8 +1077,28 @@ function ComponentsIndexPage() {
         <img src="/illustrations/target-accent.svg" alt="" aria-hidden className="hidden h-24 w-auto sm:block" />
       </div>
 
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Filter components">
+        {(
+          [
+            { id: 'all', label: 'All' },
+            { id: 'maps', label: 'Maps' },
+            { id: 'fleet', label: 'Fleet maintenance' },
+          ] as const
+        ).map((chip) => (
+          <button
+            key={chip.id}
+            type="button"
+            aria-pressed={family === chip.id}
+            onClick={() => setFamily(chip.id)}
+            className={cn('rounded-full border px-3.5 py-1.5 text-sm transition-colors', family === chip.id ? 'border-transparent bg-foreground text-background' : 'text-muted-foreground hover:bg-muted')}
+          >
+            {chip.label} <span className="font-mono text-xs opacity-70">{counts[chip.id]}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {COMPONENTS.map((entry) => (
+        {shown.map((entry) => (
           <ComponentCard key={entry.id} id={entry.id} />
         ))}
       </div>
@@ -996,16 +1112,17 @@ function ComponentsIndexPage() {
 
 function ShotPage({ id }: { id: string }) {
   const entry = getComponent(id);
-  const preview = PREVIEWS[id];
+  const previews = usePreviews(entry ? familyOf(entry.file) : 'maps');
+  const preview = previews?.PREVIEWS[id];
   return (
     <>
       <style>{'html,body{margin:0;padding:0;background:var(--background);}'}</style>
       {preview ? (
-        <div id="shot-root" style={{ display: 'inline-block', padding: 24, width: entry?.wide ? 1000 : 600 }}>
+        <div id="shot-root" style={{ display: 'inline-block', padding: 24, width: entry?.wide ? 1000 : 700 }}>
           <Demo wide={entry?.wide}>{preview}</Demo>
         </div>
       ) : (
-        <div style={{ padding: 24 }}>Unknown component: {id}</div>
+        <div style={{ padding: 24 }}>{previews ? `Unknown component: ${id}` : 'Loading'}</div>
       )}
     </>
   );
@@ -1053,6 +1170,7 @@ export default function DocsApp() {
       ? [
           { id: 'install-the-dependencies', label: 'Install the dependencies' },
           { id: 'copy-the-component', label: 'Copy the component' },
+          { id: 'fleet-components', label: 'Fleet components' },
           { id: 'set-up-the-map', label: 'Set up the map' },
           { id: 'set-up-styles', label: 'Set up styles' },
           { id: 'requirements', label: 'Requirements' },

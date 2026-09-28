@@ -1,6 +1,6 @@
-# Paper — React components for maps and logistics
+# Paper — React components for maps and fleet operations
 
-Copy-paste components where a map is the visual: delivery tracking, store locators, fleet dashboards, route planning. Finished, product-facing screens, not another map wrapper.
+Copy-paste components in two families: 30 where a map is the visual (delivery tracking, store locators, route planning) and 30 for running a fleet (vehicle health, maintenance scheduling, work orders, parts inventory, tyres and fuel, costs). Finished, product-facing screens, not another wrapper.
 
 - **Copy-paste, not a package.** No version to chase. Copy the file and own it.
 - **Built on shadcn/ui and MapLibre GL.** Cards, buttons and badges come from the primitives you already have; the map is MapLibre with OpenFreeMap tiles, which is open source and needs no API key.
@@ -74,12 +74,29 @@ Built (all 30 from the plan):
 
 The original list of ideas is in [`docs/maps-component-ideas.md`](docs/maps-component-ideas.md). Each component also has a plain markdown doc under [`docs/components/`](docs/components).
 
+## Fleet maintenance components
+
+Thirty more, in `src/components/fleet`, all demoed with one invented fleet. They share `fleet-kit.ts` (formatting helpers); charts use `recharts`.
+
+**Vehicle health and records:** `VehicleHealthCard`, `VehicleSpecSheet`, `VehicleTimeline`, `DiagnosticCodeList`, `DocumentExpiryTracker`
+
+**Maintenance scheduling:** `ServiceDueList`, `MaintenanceCalendar`, `PmScheduleBuilder`, `ServiceIntervalGauge`, `DowntimeForecast`
+
+**Work orders and repairs:** `WorkOrderCard`, `WorkOrderBoard`, `InspectionChecklist`, `DefectReportForm`, `RepairEstimateTable`
+
+**Parts and inventory:** `PartsInventoryTable`, `StockLevelBar`, `ReorderSuggestions`, `PartsUsageChart`, `PartDetailPanel`, `PurchaseOrderCard`
+
+**Tyres, fuel and fluids:** `TireStatusGrid`, `FuelEconomyTrend`, `FluidsAndBatteryPanel`, `FuelTransactionList`
+
+**Fleet costs and stats:** `FleetKpiStrip`, `CostBreakdownChart`, `UtilizationGrid`, `VehicleLeaderboard`, `ReplacementPlanner`
+
 ## Install a component
 
 Install the map engine and helpers:
 
 ```bash
 pnpm add maplibre-gl lucide-react clsx tailwind-merge
+# fleet charts also need: pnpm add recharts
 ```
 
 Every map component imports one shared file, `map-kit.tsx` (the `useMap` hook, a canvas, a marker component, and geometry helpers). Copy it once, then add the shadcn/ui primitives a component uses and copy the component in:

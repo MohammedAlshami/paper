@@ -278,9 +278,9 @@ export function Demo({
       <div className="DemoPlayground">
         <div
           className="DemoPlaygroundInner"
-          style={wide ? { justifyContent: 'stretch', alignItems: 'stretch', minWidth: 0 } : undefined}
+          style={wide ? { justifyContent: 'stretch', alignItems: 'stretch', minWidth: 0 } : { minWidth: 0 }}
         >
-          <div style={wide ? { width: '100%', textAlign: 'left' } : undefined}>{children}</div>
+          <div style={wide ? { width: '100%', textAlign: 'left' } : { width: '100%', display: 'flex', justifyContent: 'center', minWidth: 0 }}>{children}</div>
         </div>
       </div>
 
