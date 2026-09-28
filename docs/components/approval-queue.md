@@ -1,3 +1,65 @@
+# ApprovalQueue
+
+Every run blocked on a person, in one inbox.
+
+Pending approvals across all runs with multi-select and bulk approve or reject, filtered by risk — the screen that makes human-in-the-loop workable at more than one run a day.
+
+**Category:** Operations · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge button table
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/approval-queue.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<ApprovalQueue
+  approvals={approvals}
+  onApprove={(selected) => approve(selected.map((a) => a.id))}
+  onReject={(selected) => reject(selected.map((a) => a.id))}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { ApprovalQueue } from '@/components/agent-ops/approval-queue';
+
+// PendingApproval: id, action, tool, risk, runId, workflow, requestedAt, expiresIn?
+<ApprovalQueue approvals={approvals} onApprove={approve} onReject={reject} />
+```
+
+## Examples
+
+### Four runs blocked on people
+
+```tsx
+<ApprovalQueue approvals={approvals} onApprove={approve} />
+```
+
+## API reference
+
+#### ApprovalQueue · PendingApproval
+
+Bulk actions receive the selected approvals.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `approvals` | `PendingApproval[]` | id, action, tool, risk, runId, workflow, requestedAt, expiresIn? |
+| `onApprove / onReject` | `(approvals: PendingApproval[]) => void` | Called with the selection. |
+
+## Source
+
+`src/components/agent-ops/approval-queue.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -137,3 +199,4 @@ export function ApprovalQueue({
     </Panel>
   );
 }
+```

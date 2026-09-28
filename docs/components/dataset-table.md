@@ -1,3 +1,69 @@
+# DatasetTable
+
+The test data behind the evals, versioned like everything else.
+
+Dataset rows with their expected output, tags and last score, plus import, export and add-row actions — the part of evals that is easy to leave in a spreadsheet.
+
+**Category:** Evaluation · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge button table
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/dataset-table.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<DatasetTable
+  name="Brief test set"
+  version="7"
+  rows={rows}
+  onAddRow={addRow}
+  onImport={importCsv}
+  onExport={exportCsv}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { DatasetTable } from '@/components/agent-ops/dataset-table';
+
+// DatasetRow: id, input, expected?, lastScore?, tags?
+<DatasetTable name="Brief test set" rows={rows} onAddRow={addRow} />
+```
+
+## Examples
+
+### A versioned test set
+
+```tsx
+<DatasetTable name="Brief test set" version="7" rows={rows} />
+```
+
+## API reference
+
+#### DatasetTable · DatasetRow
+
+Scores render as a slim bar so regressions are scannable.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `rows` | `DatasetRow[]` | id, input, expected?, lastScore?, tags? |
+| `name / version` | `string` | Header labels. |
+| `onAddRow / onImport / onExport` | `() => void` | Dataset actions. |
+
+## Source
+
+`src/components/agent-ops/dataset-table.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -106,3 +172,4 @@ export function DatasetTable({
     </Panel>
   );
 }
+```

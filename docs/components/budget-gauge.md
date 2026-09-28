@@ -1,3 +1,68 @@
+# BudgetGauge
+
+Spend against the budget, with the forecast you did not want.
+
+Used, remaining and projected spend against thresholds, with the forecast marked on the bar — so budget is a decision made now rather than a surprise at the end of the month.
+
+**Category:** Cost & limits · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge separator
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/budget-gauge.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<BudgetGauge period="October" budget={120} spent={78.4} forecast={148.2} thresholds={[50, 80, 100]} />
+```
+
+## Anatomy
+
+```tsx
+import { BudgetGauge } from '@/components/agent-ops/budget-gauge';
+
+// the forecast marker is the difference between "fine" and "fine until Sunday"
+<BudgetGauge budget={120} spent={78.4} forecast={148.2} />
+```
+
+## Examples
+
+### On track
+
+```tsx
+<BudgetGauge budget={120} spent={41.2} forecast={88.4} />
+```
+
+### Projected over budget
+
+```tsx
+<BudgetGauge budget={120} spent={78.4} forecast={148.2} />
+```
+
+## API reference
+
+#### BudgetGauge
+
+The badge flips to “projected over” when the forecast exceeds the budget.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `budget / spent / forecast?` | `number` | Forecast defaults to nothing and the marker is hidden. |
+| `period` | `string` | Shown next to the title. |
+| `thresholds` | `number[]` | Percentages drawn as ticks. Defaults to [50, 80, 100]. |
+
+## Source
+
+`src/components/agent-ops/budget-gauge.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -85,3 +150,4 @@ export function BudgetGauge({
     </Panel>
   );
 }
+```

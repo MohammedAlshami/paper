@@ -29,6 +29,7 @@ import {
   SubtitleLink,
 } from './md';
 import { COMPONENTS, getComponent, type ComponentEntry } from './registry';
+import { getSource } from './source';
 import {
   APPROVAL_EMAIL,
   EVENTS,
@@ -758,6 +759,7 @@ function ConsolePage() {
 
 const COMPONENT_SECTIONS: QuickNavItem[] = [
   { id: 'installation', label: 'Installation' },
+  { id: 'source', label: 'Source' },
   { id: 'usage', label: 'Usage' },
   { id: 'anatomy', label: 'Anatomy' },
   { id: 'examples', label: 'Examples' },
@@ -778,7 +780,7 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
               </svg>
               View source
             </SubtitleLink>
-            <SubtitleLink href={`${REPO}#readme`}>View as Markdown</SubtitleLink>
+            <SubtitleLink href={`${REPO}/blob/main/docs/components/${entry.id}.md`}>View as Markdown</SubtitleLink>
           </>
         }
       >
@@ -793,8 +795,8 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
 
       <MdH2 id="installation">Installation</MdH2>
       <MdP>
-        The component is built on shadcn/ui primitives. Add the ones it uses, then copy{' '}
-        <Code>src/{entry.file}</Code> into your project.
+        There is no package here — copy the file below into <Code>src/{entry.file}</Code> and it's yours to edit. It's
+        built on shadcn/ui primitives, so add those first:
       </MdP>
       <CodeBlock file="terminal" language="bash" code={`pnpm dlx shadcn@latest add ${entry.primitives.join(' ')}`} />
       {entry.deps.length ? (
@@ -803,6 +805,12 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
           <InstallBlock packages={entry.deps.join(' ')} />
         </>
       ) : null}
+
+      <MdH2 id="source">Source</MdH2>
+      <MdP>
+        The full, real file — this is what you paste. Anything shorter than this is a usage example, not the component.
+      </MdP>
+      <CodeBlock file={entry.file.split('/').pop()} code={getSource(entry.file)} />
 
       <MdH2 id="usage">Usage</MdH2>
       <CodeBlock code={entry.usage} />

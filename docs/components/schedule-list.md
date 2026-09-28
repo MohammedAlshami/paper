@@ -1,3 +1,67 @@
+# ScheduleList
+
+The cron jobs behind the workflows, with last night’s outcome.
+
+Cron expression and a human reading of it, the next run in local time, and how the last run actually ended — the detail that decides whether a schedule is trustworthy.
+
+**Category:** Operations · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge button table
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/schedule-list.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<ScheduleList
+  schedules={schedules}
+  onToggle={(schedule) => setEnabled(schedule.id, !schedule.enabled)}
+  onEdit={(schedule) => openEditor(schedule)}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { ScheduleList } from '@/components/agent-ops/schedule-list';
+
+// Schedule: id, workflow, cron, humanReading, timezone?, nextRun, lastRun?, enabled
+<ScheduleList schedules={schedules} onToggle={toggle} />
+```
+
+## Examples
+
+### A failed nightly and a paused weekly
+
+```tsx
+<ScheduleList schedules={schedules} onToggle={toggle} />
+```
+
+## API reference
+
+#### ScheduleList · Schedule
+
+Cron is rendered as code; the human reading sits next to it.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `workflow / cron / humanReading` | `string` | What runs and when. |
+| `nextRun / timezone?` | `string` | e.g. in 15h 32m · Asia/Kuala_Lumpur. |
+| `lastRun` | `{ at: string, status: 'succeeded' | 'failed' | 'cancelled' }` | Rendered as a badge. |
+| `enabled / onToggle / onEdit` | `boolean · callbacks` | Enable and edit actions. |
+
+## Source
+
+`src/components/agent-ops/schedule-list.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -111,3 +175,4 @@ export function ScheduleList({
     </Panel>
   );
 }
+```

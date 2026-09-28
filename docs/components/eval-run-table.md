@@ -1,3 +1,75 @@
+# EvalRunTable
+
+Every test case, its score, and the ones that regressed.
+
+A pass rate in the header, a score bar per case, and duration, tokens and cost per case — so a regression is a row, not a vibe.
+
+**Category:** Evaluation · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge button table
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/eval-run-table.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<EvalRunTable
+  name="Groundedness eval"
+  model="gpt-5"
+  cases={cases}
+  onRun={runEval}
+  onRerunCase={(testCase) => rerun(testCase.id)}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { EvalRunTable } from '@/components/agent-ops/eval-run-table';
+
+// EvalCase: id, name, input, expected?, score? (0-100), passed?, durationMs?, tokens?, cost?
+<EvalRunTable cases={cases} onRun={runEval} />
+```
+
+## Examples
+
+### With one case still running
+
+```tsx
+<EvalRunTable cases={cases} onRun={runEval} />
+```
+
+### Pass rate only
+
+```tsx
+<EvalRunTable cases={cases.filter((c) => c.score !== undefined)} />
+```
+
+## API reference
+
+#### EvalRunTable · EvalCase
+
+Cases without a score render as unscored.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `name / model` | `string` | Header labels. |
+| `cases` | `EvalCase[]` | id, name, input, expected?, score?, passed?, durationMs?, tokens?, cost? |
+| `onRun` | `() => void` | Runs the whole eval. |
+| `onRerunCase / onSelectCase` | `(testCase) => void` | Per-row actions. |
+
+## Source
+
+`src/components/agent-ops/eval-run-table.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -133,3 +205,4 @@ export function EvalRunTable({
     </Panel>
   );
 }
+```

@@ -1,3 +1,67 @@
+# RateLimitMeter
+
+The quota wall, before you hit it.
+
+Per-provider and per-model usage against the limit for a window, with the reset countdown and a state that turns “close to limit” into something you can see in advance.
+
+**Category:** Cost & limits · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge
+```
+
+Copy the file below into `src/components/agent-ops/rate-limit-meter.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<RateLimitMeter limits={limits} />
+```
+
+## Anatomy
+
+```tsx
+import { RateLimitMeter } from '@/components/agent-ops/rate-limit-meter';
+
+// RateLimit: provider, model?, used, limit, window, resetIn (e.g. '14s', '—' for concurrency)
+<RateLimitMeter limits={limits} />
+```
+
+## Examples
+
+### Ok, close and exceeded
+
+```tsx
+<RateLimitMeter limits={limits} />
+```
+
+### A single provider
+
+```tsx
+<RateLimitMeter limits={limits.slice(0, 1)} />
+```
+
+## API reference
+
+#### RateLimitMeter · RateLimit
+
+State is derived: ok under 80%, close under 100%, exceeded at or over.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `provider / model?` | `string` | Provider name and optional model. |
+| `used / limit` | `number` | Current usage and the ceiling. |
+| `window` | `string` | minute, day, concurrent… |
+| `resetIn` | `string` | Human countdown, e.g. 14s. |
+
+## Source
+
+`src/components/agent-ops/rate-limit-meter.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -60,3 +124,4 @@ export function RateLimitMeter({ limits, className }: { limits: RateLimit[]; cla
     </Panel>
   );
 }
+```

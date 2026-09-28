@@ -1,30 +1,45 @@
 /*
-  base-ui.com's design system, copied verbatim (fonts, tokens, layout, markdown,
-  code blocks, demo frames, API-reference accordions, syntax highlighting).
-  It is imported first so our own utility classes (below) win any name clash.
+  ============================================================================
+  Layer 1 — docs shell, copied verbatim from base-ui.com.
+
+  This is chrome around the components: the sidebar, quick-nav, mobile nav,
+  the markdown/prose/subtitle/link/popup styles, the code block and demo-frame
+  interaction styles. Nothing in src/components/ depends on these classes —
+  they only style DocsApp.tsx and md.tsx. Files were originally hashed/unnamed
+  (e.g. "06-daa4302ffc926253.css"); renamed here to what each one actually
+  styles, content otherwise untouched. Edit with care: hand-written diffs
+  against minified upstream CSS are easy to get subtly wrong.
+  ============================================================================
 */
-@import './baseui/01-44ff1ae4349b6959.css';
-@import './baseui/02-0c3ac0218c2685bc.css';
-@import './baseui/03-ed81178c91e5ace3.css';
-@import './baseui/04-2afa6cec447785ac.css';
-@import './baseui/05-0e11bf85f41ee0b7.css';
-@import './baseui/06-daa4302ffc926253.css';
-@import './baseui/07-4f3e683c0e619945.css';
-@import './baseui/08-543e2f9cd0650fcf.css';
-@import './baseui/09-4fb3c78cd6c0e5f5.css';
-@import './baseui/10-366f8b42fe7a6f53.css';
-@import './baseui/11-f0b7e9a19835187a.css';
-@import './baseui/12-a63c42a6718ef0be.css';
-@import './baseui/13-0096d1d1ffb3434e.css';
+@import './baseui/link.css';
+@import './baseui/popup.css';
+@import './baseui/quick-nav.css';
+@import './baseui/mobile-nav.css';
+@import './baseui/side-nav.css';
+@import './baseui/docs-components.css';
+@import './baseui/page-layout.css';
+@import './baseui/demo-interactions.css';
+@import './baseui/code-block.css';
+@import './baseui/focus-ring.css';
+@import './baseui/mono-text.css';
+@import './baseui/subtitle.css';
+@import './baseui/typography.css';
 
 @import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));
 
 /*
-  shadcn/ui tokens, tuned to the same palette the docs use, so our components and
-  the documentation shell look like one product: white surfaces, #2e2e2e ink,
-  8%-black hairlines, #f9f9f9 wells, #767676 muted text.
+  ============================================================================
+  Layer 2 — component tokens, shadcn/ui style.
+
+  This is what src/components/ui/* and src/components/agent-ops/* actually
+  read (--background, --primary, --border, ...). Tuned to the same palette
+  the docs shell above uses, so the two layers read as one product: white
+  surfaces, #2e2e2e ink, 8%-black hairlines, #f9f9f9 wells, #767676 muted
+  text. If you're restyling a *component*, this is the block to change —
+  Layer 1 above should stay untouched.
+  ============================================================================
 */
 :root {
   --radius: 0.5rem;

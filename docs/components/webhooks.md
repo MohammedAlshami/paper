@@ -1,3 +1,75 @@
+# WebhookList
+
+The way work arrives, and whether your endpoint is answering.
+
+Endpoints with their subscribed events, the last delivery with its status code and duration, a success rate, and a replay for the delivery you need to send again.
+
+**Category:** Operations · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge button table
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/webhook-list.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<WebhookList
+  endpoints={endpoints}
+  onSendTest={(endpoint) => sendTest(endpoint.id)}
+  onReplay={(endpoint) => replay(endpoint.id)}
+  onToggle={(endpoint) => setEnabled(endpoint.id, !endpoint.enabled)}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { WebhookList } from '@/components/agent-ops/webhook-list';
+
+// WebhookEndpoint: id, url, events, enabled, successRate?, lastDelivery?
+<WebhookList endpoints={endpoints} onReplay={replay} />
+```
+
+## Examples
+
+### A failing endpoint next to a healthy one
+
+```tsx
+<WebhookList endpoints={endpoints} onReplay={replay} />
+```
+
+### Healthy endpoints only
+
+```tsx
+<WebhookList endpoints={endpoints.filter((e) => (e.successRate ?? 0) > 90)} />
+```
+
+## API reference
+
+#### WebhookList · WebhookEndpoint
+
+URLs render as plain text, never as links.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `url` | `string` | The endpoint that receives the events. |
+| `events` | `string[]` | Subscribed event names, shown as badges. |
+| `lastDelivery` | `{ at, status: 'delivered' | 'failed' | 'pending', code?, ms? }` | The last attempt. |
+| `successRate` | `number` | Percentage, 0–100. |
+| `onSendTest / onReplay / onToggle` | `(endpoint) => void` | Endpoint actions. |
+
+## Source
+
+`src/components/agent-ops/webhook-list.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -117,3 +189,4 @@ export function WebhookList({
     </Panel>
   );
 }
+```

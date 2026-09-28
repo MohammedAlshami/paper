@@ -10,6 +10,9 @@ The chat layer is commodity. This is the part that today only exists inside clos
 
 Live docs: **https://paper.mshami2021.workers.dev**
 
+Every component also has a plain markdown doc under [`docs/components/`](docs/components) — installation, usage,
+the full source, and the API reference in one file, for reading on GitHub or feeding to an LLM without the docs site.
+
 ## Components
 
 **Run control & progress** — `RunHeader`, `RunTimeline`, `ReplayScrubber`, `RunQueue`

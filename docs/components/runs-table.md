@@ -1,3 +1,68 @@
+# RunsTable
+
+The index of every run.
+
+Status, workflow, run id, trigger, step progress, duration, cost and start time — filterable by status, with per-row re-run and cancel.
+
+**Category:** Management · **Status:** ready
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card button badge table
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/runs-table.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<RunsTable
+  runs={runs}
+  onSelect={(run) => open(run.id)}
+  onRerun={(run) => rerun(run.id)}
+  onCancel={(run) => cancel(run.id)}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { RunsTable } from '@/components/agent-ops/runs-table';
+
+// RunSummary rows: id, workflow, status, trigger, startedAt, durationMs, cost, stepsDone, stepsTotal
+<RunsTable runs={summaries} onSelect={open} />
+```
+
+## Examples
+
+### All runs
+
+```tsx
+<RunsTable runs={runs} onSelect={open} />
+```
+
+## API reference
+
+#### RunsTable · RunSummary
+
+The run index.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `runs` | `RunSummary[]` | id, workflow, status, trigger?, actor?, startedAt?, durationMs?, cost?, stepsDone?, stepsTotal? |
+| `onSelect` | `(run: RunSummary) => void` | Called when a row is clicked. |
+| `onRerun` | `(run: RunSummary) => void` | Called from the row action. |
+| `onCancel` | `(run: RunSummary) => void` | Called from the row action. |
+
+## Source
+
+`src/components/agent-ops/runs-table.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -132,3 +197,4 @@ export function RunsTable({
     </Panel>
   );
 }
+```

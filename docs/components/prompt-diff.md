@@ -1,3 +1,71 @@
+# PromptDiff
+
+What changed in the prompt, and whether to publish it.
+
+Version chips, the author and date on both sides, a line diff of the bodies, and the publish or discard decision — prompt changes reviewed like code.
+
+**Category:** Authoring · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge button separator
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/prompt-diff.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<PromptDiff
+  versions={versions}
+  activeVersionId="v4"
+  onSelectVersion={setVersion}
+  before={versions[2].body}
+  after={versions[3].body}
+  onPublish={publish}
+  onDiscard={discard}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { PromptDiff } from '@/components/agent-ops/prompt-diff';
+
+// PromptVersion: id, label, author?, createdAt?, status? ('draft' | 'published' | 'archived')
+<PromptDiff versions={versions} before={before} after={after} onPublish={publish} />
+```
+
+## Examples
+
+### Draft vs published
+
+```tsx
+<PromptDiff versions={versions} before={before} after={after} />
+```
+
+## API reference
+
+#### PromptDiff
+
+The diff itself is the same LCS line diff as RunDiff.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `versions` | `PromptVersion[]` | id, label, author?, createdAt?, status? |
+| `before / after` | `string` | The two prompt bodies. |
+| `activeVersionId` | `string` | Highlights the selected version chip. |
+| `onSelectVersion / onPublish / onDiscard` | `callbacks` | Version and decision handlers. |
+
+## Source
+
+`src/components/agent-ops/prompt-diff.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -89,3 +157,4 @@ export function PromptDiff({
     </Panel>
   );
 }
+```

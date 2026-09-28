@@ -1,3 +1,77 @@
+# RunQueue
+
+What is waiting to run, in what order.
+
+Queued runs with priority, wait time and what they are blocked on, alongside worker utilisation and a pause for the whole queue — the back-pressure view.
+
+**Category:** Operations · **Status:** new
+
+## Installation
+
+```bash
+pnpm dlx shadcn@latest add card badge button progress
+```
+
+And the packages the file imports: `lucide-react`
+
+Copy the file below into `src/components/agent-ops/run-queue.tsx` in your project. There is no package to install and no
+version to track — you own this file from the moment you paste it.
+
+## Usage
+
+```tsx
+<RunQueue
+  runs={queued}
+  running={3}
+  concurrency={4}
+  paused={paused}
+  onTogglePause={toggle}
+  onPromote={(run) => promote(run.id)}
+  onRemove={(run) => remove(run.id)}
+/>
+```
+
+## Anatomy
+
+```tsx
+import { RunQueue } from '@/components/agent-ops/run-queue';
+
+// QueuedRun: id, workflow, priority, queuedFor, trigger?, waitingOn?
+<RunQueue runs={queued} running={3} concurrency={4} onPromote={promote} />
+```
+
+## Examples
+
+### Three of four workers busy
+
+```tsx
+<RunQueue runs={queued} running={3} concurrency={4} />
+```
+
+### Paused
+
+```tsx
+<RunQueue runs={queued} running={0} concurrency={4} paused />
+```
+
+## API reference
+
+#### RunQueue · QueuedRun
+
+Order in the array is queue order; promote is your chance to change it.
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `runs` | `QueuedRun[]` | id, workflow, priority, queuedFor, trigger?, waitingOn? |
+| `running / concurrency` | `number` | Drives the utilisation bar. |
+| `paused / onTogglePause` | `boolean · () => void` | Pauses the whole queue. |
+| `onPromote / onRemove` | `(run) => void` | Per-row actions. |
+
+## Source
+
+`src/components/agent-ops/run-queue.tsx`
+
+```tsx
 'use client';
 
 import * as React from 'react';
@@ -105,3 +179,4 @@ export function RunQueue({
     </Panel>
   );
 }
+```
