@@ -1,127 +1,120 @@
-# Paper — React components for AI workflow runs
+# Paper — React components for maps and logistics
 
-Thirty copy-paste components for the **operations** side of an AI product: running a workflow, watching each step, replaying it, forking it, comparing the branch, grading the output, watching the cost, and approving a side effect before it happens.
+Copy-paste components where a map is the visual: delivery tracking, store locators, fleet dashboards, route planning. Finished, product-facing screens, not another map wrapper.
 
-The chat layer is commodity. This is the part that today only exists inside closed observability platforms.
-
-- **Copy-paste, not a package.** No version to chase — copy the file and own it.
-- **Built on shadcn/ui.** Every component composes primitives you already have (`button`, `card`, `badge`, `table`, `tabs`, `progress`, …), so it inherits your theme.
-- **Docs like Base UI's.** The documentation site is a faithful clone of `base-ui.com`'s docs: same fonts, tokens, sidebar, quick-nav, code blocks, demo frames and API-reference accordions.
+- **Copy-paste, not a package.** No version to chase. Copy the file and own it.
+- **Built on shadcn/ui and MapLibre GL.** Cards, buttons and badges come from the primitives you already have; the map is MapLibre with OpenFreeMap tiles, which is open source and needs no API key.
+- **Real source in the docs.** Every component page shows the full file you paste, plus usage, examples and the API reference.
 
 Live docs: **https://paper.mshami2021.workers.dev**
 
-Every component also has a plain markdown doc under [`docs/components/`](docs/components) — installation, usage,
-the full source, and the API reference in one file, for reading on GitHub or feeding to an LLM without the docs site.
-
 ## Components
 
-**Run control & progress** — `RunHeader`, `RunTimeline`, `ReplayScrubber`, `RunQueue`
-**Inspecting** — `StepDetail`, `SpanWaterfall`, `EventStream`, `LogViewer`, `ErrorPanel`, `RunDiff`, `AnomalyFeed`
-**Authoring** — `WorkflowGraph`, `StepSchemaForm`, `PromptEditor`, `PromptDiff`
-**Branching** — `ForkPanel`, `BranchCompare`
-**Evaluation** — `EvalRunTable`, `ScorePanel`, `DatasetTable`, `Playground`
-**Cost & limits** — `RunMetrics`, `CostBreakdown`, `BudgetGauge`, `RateLimitMeter`
-**Human in the loop** — `ApprovalStep`, `ApprovalQueue`
-**Operations** — `RunsTable`, `ScheduleList`, `WebhookList`
+Built (all 30 from the plan):
+
+**Tracking and delivery**
 
 | Component | What it is for |
 | --- | --- |
-| `RunHeader` | Workflow, state, progress, counters and controls (pause · resume · re-run · cancel) |
-| `RunTimeline` | The workflow's steps in order, with live state, retries and inline errors |
-| `ReplayScrubber` | Transport for a finished run: play, step, speed, scrub |
-| `RunQueue` | What is waiting to run, in what order, and what it is blocked on |
-| `StepDetail` | One step: input/output payloads, duration, tokens, cost, error, retry/skip |
-| `SpanWaterfall` | The trace drawn to scale, so a slow tool or a long human wait is visible |
-| `EventStream` | The run's live log, filtered by level, with follow-the-tail |
-| `LogViewer` | The raw logs: search, level filters, wrap, follow |
-| `ErrorPanel` | What broke, whether it is retryable, and the request that caused it |
-| `RunDiff` | A line diff between two runs, prompts or payloads |
-| `AnomalyFeed` | Cost spikes, latency regressions, loops and drift, with acknowledgement |
-| `WorkflowGraph` | The workflow as a node graph, with live state on every node |
-| `StepSchemaForm` | A form generated from a step's declared inputs, with the payload in view |
-| `PromptEditor` | Prompt bodies, detected `{{variables}}`, token estimate, save a version |
-| `PromptDiff` | Prompt versions compared, with publish or discard |
-| `ForkPanel` | Branch a run from a step, editing the input on the way in |
-| `BranchCompare` | Parent vs fork, step by step, with duration and token deltas |
-| `EvalRunTable` | Every test case, its score, and the ones that regressed |
-| `ScorePanel` | Weighted rubric scores, grader comments, and a human override |
-| `DatasetTable` | The test data behind the evals, versioned |
-| `Playground` | One input, several variants, side by side, until one wins |
-| `RunMetrics` | Success rate, p95, cost per run, retry rate, failure reasons |
-| `CostBreakdown` | Where the money went, by day and by model or step |
-| `BudgetGauge` | Spend against the budget, with the forecast you did not want |
-| `RateLimitMeter` | Per-model quota usage with reset countdowns |
-| `ApprovalStep` | Human-in-the-loop before the side effect, arguments shown first |
-| `ApprovalQueue` | Every run blocked on a person, with bulk approve and reject |
-| `RunsTable` | The run index: status, trigger, progress, duration, cost, actions |
-| `ScheduleList` | The cron jobs behind the workflows, with last night's outcome |
-| `WebhookList` | The way work arrives, and whether your endpoint is answering |
+| `DeliveryTrackerCard` | Where the order is, who has it, and when it arrives. |
+| `OrderRouteMini` | One order as a list row, with its route on a thumbnail. |
+| `DriverArrivingSheet` | The ride-share moment: the car closing in, and who is in it. |
+| `ShipmentJourney` | A shipment across trucks, ships and planes, leg by leg. |
+| `ProofOfDelivery` | The record of a drop-off: photo, place, time, signature. |
 
-Every component reads the same model (`src/components/agent-ops/types.ts`): `Run` → `RunStep[]` → `RunEvent[]`, plus `RunSummary`, `Kpi` and `TrendPoint`. Component-specific shapes (`Span`, `LogLine`, `EvalCase`, `RateLimit`, …) live next to the component that renders them. Nothing owns your data.
+**Store and place discovery**
 
-## State without colour
-
-Six run states, no hues spent. State is carried by shape, fill, weight and icon:
-
-| State | Mark |
+| Component | What it is for |
 | --- | --- |
-| queued | hollow circle |
-| running | spinning arc in the ring |
-| waiting | half-filled circle and a half-filled bar (blocked on a human) |
-| done | filled circle with a check |
-| failed | circle with an ✕, error inline |
-| skipped | faint outline and a strikethrough |
+| `StoreLocator` | Find the nearest one, on a map and in a list that agree with each other. |
+| `PlaceCard` | One place: how good it is, how far it is, how to get there. |
+| `NearbyList` | What is close, nearest first, with the walk. |
+| `BranchDirectory` | Offices grouped by region, with the map and the contact details. |
+| `EventVenueCard` | When and where, and where to park. |
 
-## Quick start
+**Location pickers and forms**
+
+| Component | What it is for |
+| --- | --- |
+| `AddressPicker` | Search for an address or drop a pin, then confirm. |
+| `ServiceAreaChecker` | Do we deliver to you? Type an address, get a yes or a no. |
+| `PickupPointSelector` | Choose where to collect: lockers, stores, post offices. |
+| `LocationBadge` | A city as a chip; hover it for a map. |
+| `MapCoordinatesInput` | Latitude and longitude fields that move a pin, and back. |
+
+**Fleet and operations**
+
+| Component | What it is for |
+| --- | --- |
+| `FleetOverview` | Every vehicle on one map, with counts by status. |
+| `VehicleDetailPanel` | One vehicle: speed, fuel, driver, and where it has been. |
+| `DispatchBoard` | Drag a job onto a driver. Or tap it, on a phone. |
+| `RouteOptimizerResult` | The route as booked against the route after optimising. |
+| `GeofenceAlertFeed` | Who crossed which boundary, with a snapshot of where. |
+
+**Data visualisation**
+
+| Component | What it is for |
+| --- | --- |
+| `RegionChoropleth` | Regions shaded by a number, and ranked beside the map. |
+| `OriginDestinationFlow` | Arcs between places, as thick as the volume between them. |
+| `HeatmapCard` | Where activity is dense, for the hours you pick. |
+| `CoverageMap` | Where a network reaches, and how well. |
+| `TripReplay` | A recorded trip you can scrub and play back. |
+
+**Travel and real estate**
+
+| Component | What it is for |
+| --- | --- |
+| `TripSummaryCard` | A finished trip: the route, the numbers, and the climb. |
+| `ItineraryMap` | A trip day by day, with the stops, the route and the list in step. |
+| `PropertyMapCard` | Listings as price tags; pick one to see what is around it. |
+| `CommuteCalculator` | How long to work from here? Drop a pin and see. |
+| `WeatherAlertMap` | The regions under a storm, a flood or a closure. |
+
+The original list of ideas is in [`docs/maps-component-ideas.md`](docs/maps-component-ideas.md). Each component also has a plain markdown doc under [`docs/components/`](docs/components).
+
+## Install a component
+
+Install the map engine and helpers:
+
+```bash
+pnpm add maplibre-gl lucide-react clsx tailwind-merge
+```
+
+Every map component imports one shared file, `map-kit.tsx` (the `useMap` hook, a canvas, a marker component, and geometry helpers). Copy it once, then add the shadcn/ui primitives a component uses and copy the component in:
+
+```bash
+pnpm dlx shadcn@latest add card button badge input
+cp src/components/maps/map-kit.tsx ./src/components/maps/
+cp src/components/maps/store-locator.tsx ./src/components/maps/
+```
+
+MapLibre runs its rendering in a web worker. `map-kit.tsx` points it at the worker with the Vite form (`?worker&url`); other bundlers need their own equivalent.
+
+## Use it
+
+```tsx
+import { DeliveryTrackerCard } from '@/components/maps/delivery-tracker-card';
+
+<DeliveryTrackerCard
+  orderId="#48213"
+  origin={{ label: 'Bi-Rite Market', position: [-122.4241, 37.7615] }}
+  destination={{ label: '412 Hayes St', position: [-122.434, 37.7758] }}
+  driver={{ name: 'Marcus Lee', vehicle: 'White Toyota Prius', rating: 4.9, position: driverPosition }}
+  route={route}
+  steps={steps}
+  currentStepId="on-the-way"
+  etaMinutes={6}
+/>
+```
+
+Positions are `[longitude, latitude]`, longitude first, as in GeoJSON. Routes come from your own routing API (OSRM, Mapbox, Google); the components draw them and never fetch them.
+
+## Develop
 
 ```bash
 npm install
-npm run dev      # http://localhost:3100
-npm run deploy   # build and ship the docs to Cloudflare Workers
+npm run dev      # docs on http://localhost:3100
+npm run build
 ```
-
-Add the primitives a component uses (the exact list is in its Installation section):
-
-```bash
-pnpm dlx shadcn@latest add card button badge separator
-```
-
-then copy the file:
-
-```bash
-cp src/components/agent-ops/{run-timeline,types}.tsx ./src/components/agent-ops/
-```
-
-```tsx
-import { RunTimeline } from '@/components/agent-ops/run-timeline';
-
-<RunTimeline run={run} selectedStepId={step.id} onSelectStep={setStep} />;
-```
-
-## Docs site
-
-`src/docs` is the documentation app, and it is deliberately a copy of Base UI's docs design:
-
-- `src/styles/baseui/*.css` — Base UI's own stylesheets, copied verbatim (layout, markdown, code blocks, demo frames, API tables, syntax theme).
-- `src/styles/app.css` — our shadcn/ui tokens, tuned to the same palette.
-- `src/docs/md.tsx` — the markdown, code, demo and API-table primitives, built with Base UI's class names.
-- `src/docs/DocsApp.tsx` — the shell: header, side nav, quick nav, pages, ⌘K search.
-- `src/docs/registry.ts` + `registry-ops.ts` + `previews.tsx` — the content for all thirty component pages.
-
-React Grab is wired in dev only (`src/main.tsx`). Select any element in the docs and you get the file it came from.
-
-## Deploy
-
-The docs are a static build deployed as a Cloudflare Worker with static assets:
-
-```bash
-npm run deploy
-```
-
-## Known caveat: fonts
-
-The docs use the same self-hosted fonts as Base UI's site (`public/fonts`: *Die Grotesk* and *Paper Mono*), copied so the design matches. **Die Grotesk is a commercial typeface** — before publishing widely, either license it or swap `--font-sans` in `src/styles/app.css` for a substitute.
-
-## Licence
-
-MIT for the code. Base UI's stylesheets and fonts belong to their authors; the design is copied here as a placeholder scaffold.

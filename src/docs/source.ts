@@ -5,7 +5,7 @@ const RAW_FILES = import.meta.glob('/src/components/**/*.{ts,tsx}', {
   import: 'default',
 }) as Record<string, string>;
 
-/** `file` is the path used in the registry, e.g. "components/agent-ops/run-header.tsx". */
+/** `file` is the path used in the registry, e.g. "components/maps/delivery-tracker-card.tsx". */
 export function getSource(file: string): string {
   const source = RAW_FILES[`/src/${file}`];
   if (!source) throw new Error(`No source found for src/${file}`);

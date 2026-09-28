@@ -1,16 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { ApprovalStep } from '@/components/agent-ops/approval-step';
-import { BranchCompare } from '@/components/agent-ops/branch-compare';
-import { EventStream } from '@/components/agent-ops/event-stream';
-import { ForkPanel } from '@/components/agent-ops/fork-panel';
-import { ReplayScrubber } from '@/components/agent-ops/replay-scrubber';
-import { RunHeader } from '@/components/agent-ops/run-header';
-import { RunMetrics } from '@/components/agent-ops/run-metrics';
-import { RunTimeline } from '@/components/agent-ops/run-timeline';
-import { RunsTable } from '@/components/agent-ops/runs-table';
-import { StepDetail } from '@/components/agent-ops/step-detail';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   ApiTable,
   Code,
@@ -30,19 +22,7 @@ import {
 } from './md';
 import { COMPONENTS, getComponent, type ComponentEntry } from './registry';
 import { getSource } from './source';
-import {
-  APPROVAL_EMAIL,
-  EVENTS,
-  EXAMPLES,
-  FAILURES,
-  KPIS,
-  PREVIEWS,
-  RUNS,
-  RUN_ACTIVE,
-  RUN_BRANCH,
-  RUN_PARENT,
-  TREND,
-} from './previews';
+import { EXAMPLES, PREVIEWS } from './previews';
 
 /* ============================================================================
    navigation
@@ -51,53 +31,99 @@ import {
 type NavItem = { id: string; label: string; href: string; external?: boolean };
 type NavGroup = { heading: string; items: NavItem[] };
 
-const COMPONENT_ITEMS: NavItem[] = COMPONENTS.map((entry) => ({
-  id: entry.id,
-  label: entry.name,
-  href: `#/components/${entry.id}`,
+/** Sidebar grouping for components. */
+const SIDEBAR_COMPONENT_GROUPS: { heading: string; ids: string[] }[] = [
+  { heading: 'Tracking and delivery', ids: ['delivery-tracker-card', 'order-route-mini', 'driver-arriving-sheet', 'shipment-journey', 'proof-of-delivery'] },
+  { heading: 'Store and place discovery', ids: ['store-locator', 'place-card', 'nearby-list', 'branch-directory', 'event-venue-card'] },
+  { heading: 'Location pickers and forms', ids: ['address-picker', 'service-area-checker', 'pickup-point-selector', 'location-badge', 'map-coordinates-input'] },
+  { heading: 'Fleet and operations', ids: ['fleet-overview', 'vehicle-detail-panel', 'dispatch-board', 'route-optimizer-result', 'geofence-alert-feed'] },
+  { heading: 'Data visualisation', ids: ['region-choropleth', 'origin-destination-flow', 'heatmap-card', 'coverage-map', 'trip-replay'] },
+  { heading: 'Travel and real estate', ids: ['trip-summary-card', 'itinerary-map', 'property-map-card', 'commute-calculator', 'weather-alert-map'] },
+];
+
+const COMPONENT_NAV_GROUPS: NavGroup[] = SIDEBAR_COMPONENT_GROUPS.map(({ heading, ids }) => ({
+  heading,
+  items: ids.map((id) => {
+    const entry = COMPONENTS.find((component) => component.id === id);
+    if (!entry) throw new Error(`Sidebar group "${heading}" references unknown component id "${id}"`);
+    return { id: entry.id, label: entry.name, href: `/components/${entry.id}` };
+  }),
 }));
 
 const NAV: NavGroup[] = [
   {
     heading: 'Overview',
     items: [
-      { id: 'quick-start', label: 'Quick start', href: '#/quick-start' },
-      { id: 'installation', label: 'Installation', href: '#/installation' },
-      { id: 'console', label: 'Operations console', href: '#/console' },
+      { id: 'quick-start', label: 'Quick start', href: '/quick-start' },
+      { id: 'installation', label: 'Installation', href: '/installation' },
+      { id: 'components', label: 'All components', href: '/components' },
     ],
   },
   {
     heading: 'Handbook',
     items: [
-      { id: 'styling', label: 'Styling', href: '#/styling' },
-      { id: 'composition', label: 'Composition', href: '#/composition' },
-      { id: 'typescript', label: 'TypeScript', href: '#/typescript' },
+      { id: 'styling', label: 'Styling', href: '/styling' },
+      { id: 'composition', label: 'Composition', href: '/composition' },
+      { id: 'typescript', label: 'TypeScript', href: '/typescript' },
     ],
   },
-  { heading: 'Components', items: COMPONENT_ITEMS },
+  ...COMPONENT_NAV_GROUPS,
 ];
 
 const REPO = 'https://github.com/MohammedAlshami/paper';
 
 /* ============================================================================
-   routing
+   routing — real paths (pushState), not hash fragments
+
+   Any click on an internal <a href="/..."> is intercepted and turned into a
+   pushState navigation; hash fragments (#main-content, #some-heading) are left
+   alone since those are same-page anchors, not routes.
    ========================================================================== */
 
-function useRoute() {
-  const read = () =>
-    typeof window === 'undefined' ? 'quick-start' : window.location.hash.replace(/^#\/?/, '') || 'quick-start';
+function normalizeRoute(pathname: string) {
+  return pathname.replace(/^\/+|\/+$/g, '');
+}
+
+function useRouter() {
+  const read = () => (typeof window === 'undefined' ? '' : normalizeRoute(window.location.pathname));
   const [route, setRoute] = React.useState(read);
 
+  const navigate = React.useCallback((href: string) => {
+    const path = href.startsWith('/') ? href : `/${href}`;
+    if (path !== window.location.pathname) {
+      window.history.pushState(null, '', path);
+    }
+    setRoute(normalizeRoute(path));
+    window.scrollTo({ top: 0 });
+  }, []);
+
   React.useEffect(() => {
-    const onHashChange = () => {
+    const onPopState = () => {
       setRoute(read());
       window.scrollTo({ top: 0 });
     };
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
+    window.addEventListener('popstate', onPopState);
 
-  return route;
+    const onClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as HTMLElement | null)?.closest?.('a');
+      if (!anchor) return;
+      const href = anchor.getAttribute('href');
+      if (!href || !href.startsWith('/') || href.startsWith('//')) return;
+      if (anchor.target === '_blank' || anchor.hasAttribute('download')) return;
+      event.preventDefault();
+      navigate(href);
+    };
+    document.addEventListener('click', onClick);
+
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      document.removeEventListener('click', onClick);
+    };
+  }, [navigate]);
+
+  return { route, navigate };
 }
 
 function useActiveAnchor() {
@@ -126,31 +152,135 @@ function useActiveAnchor() {
    chrome
    ========================================================================== */
 
-function Header({ onSearch }: { onSearch: () => void }) {
+function GitHubMark({ className }: { className?: string }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden className={className}>
+      <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.63 2.29 6.7 5.47 7.78.4.07.55-.17.55-.39 0-.19-.01-.84-.01-1.53-2.01.38-2.53-.5-2.69-.96-.09-.24-.48-.96-.82-1.16-.28-.15-.68-.53-.01-.54.63-.01 1.08.59 1.23.84.72 1.24 1.87.89 2.33.68.07-.53.28-.89.51-1.1-1.78-.2-3.64-.91-3.64-4.05 0-.89.31-1.63.82-2.2-.08-.21-.36-1.05.08-2.17 0 0 .67-.22 2.2.84.64-.18 1.32-.28 2-.28s1.36.09 2 .28c1.53-1.07 2.2-.84 2.2-.84.44 1.13.16 1.97.08 2.17.51.57.82 1.3.82 2.2 0 3.15-1.87 3.84-3.65 4.05.29.26.54.75.54 1.52 0 1.1-.01 1.98-.01 2.26 0 .22.15.47.55.39C13.71 14.9 16 11.82 16 8.2 16 3.67 12.42 0 8 0" />
+    </svg>
+  );
+}
+
+const HEADER_LINKS = [
+  { label: 'Quick start', href: '/quick-start' },
+  { label: 'Components', href: '/components' },
+];
+
+function MobileMenu({ route }: { route: string }) {
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => setOpen(false), [route]);
+  React.useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  return (
+    <div className="md:hidden">
+      <button
+        type="button"
+        aria-label={open ? 'Close menu' : 'Open menu'}
+        aria-expanded={open}
+        aria-controls="mobile-menu"
+        onClick={() => setOpen((value) => !value)}
+        className="flex size-9 items-center justify-center rounded-md text-foreground transition-colors hover:bg-muted"
+      >
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+          {open ? <path d="M4 4l10 10M14 4L4 14" /> : <path d="M3 5h12M3 9h12M3 13h12" />}
+        </svg>
+      </button>
+      {open ? (
+        <nav
+          id="mobile-menu"
+          aria-label="Site"
+          className="fixed inset-x-0 bottom-0 top-[var(--header-height)] z-40 overflow-y-auto bg-background px-4 pb-10 pt-2"
+        >
+          {NAV.map((group) => (
+            <div key={group.heading} className="py-3">
+              <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">{group.heading}</p>
+              <ul>
+                {group.items.map((item) => {
+                  const active = route === item.href.slice(1);
+                  return (
+                    <li key={item.href}>
+                      <a
+                        href={item.href}
+                        aria-current={active ? 'page' : undefined}
+                        className={cn('block rounded-md px-2 py-2.5 text-[15px]', active ? 'bg-muted font-medium text-foreground' : 'text-foreground/80')}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+          <div className="mt-2 border-t pt-4">
+            <a href={REPO} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-md px-2 py-2.5 text-[15px] text-foreground/80">
+              <GitHubMark /> GitHub
+            </a>
+          </div>
+        </nav>
+      ) : null}
+    </div>
+  );
+}
+
+function Header({ route, onSearch }: { route: string; onSearch: () => void }) {
   return (
     <header className="Header">
       <div className="HeaderInner">
         <a className="SkipNav" href="#main-content">
           Skip to contents
         </a>
-        <a className="HeaderLogoLink" aria-label="Go to the homepage" href="#/quick-start">
-          <svg width="20" height="18" viewBox="0 0 20 18" fill="currentColor" aria-hidden>
-            <rect x="0" y="0" width="20" height="3" rx="1.5" />
-            <rect x="0" y="7" width="13" height="3" rx="1.5" />
-            <rect x="0" y="14" width="7" height="3" rx="1.5" />
-          </svg>
-        </a>
-        <div className="HeaderSearch">
-          <button type="button" className="SearchTrigger HeaderSearchDesktopTrigger" onClick={onSearch}>
-            Search
-            <span className="SearchTriggerShortcut">
-              (<kbd>⌘</kbd>
-              <kbd>k</kbd>)
-            </span>
-          </button>
-          <button type="button" className="SearchTrigger HeaderSearchMobileTrigger" onClick={onSearch}>
-            Search
-          </button>
+        <div className="flex items-center gap-3 md:gap-8">
+          <MobileMenu route={route} />
+          <a className="HeaderLogoLink flex items-center gap-2" aria-label="Go to the homepage" href="/">
+            <svg width="20" height="18" viewBox="0 0 20 18" fill="currentColor" aria-hidden>
+              <rect x="0" y="0" width="20" height="3" rx="1.5" />
+              <rect x="0" y="7" width="13" height="3" rx="1.5" />
+              <rect x="0" y="14" width="7" height="3" rx="1.5" />
+            </svg>
+            <span className="hidden text-sm font-medium text-foreground sm:inline">Paper</span>
+          </a>
+          <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
+            {HEADER_LINKS.map((link) => {
+              const active = route === link.href.slice(1) || route.startsWith(`${link.href.slice(1)}/`);
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={cn('text-sm transition-colors hover:text-foreground', active ? 'font-medium text-foreground' : 'text-muted-foreground')}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
+          </nav>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="HeaderSearch">
+            <button type="button" className="SearchTrigger HeaderSearchDesktopTrigger" onClick={onSearch}>
+              Search
+              <span className="SearchTriggerShortcut">
+                (<kbd>⌘</kbd>
+                <kbd>k</kbd>)
+              </span>
+            </button>
+            <button type="button" className="SearchTrigger HeaderSearchMobileTrigger" onClick={onSearch}>
+              Search
+            </button>
+          </div>
+          <a
+            href={REPO}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground sm:flex"
+          >
+            <GitHubMark /> GitHub
+          </a>
         </div>
       </div>
     </header>
@@ -379,6 +509,7 @@ function QuickNav({ title, items }: { title: string; items: QuickNavItem[] }) {
    ========================================================================== */
 
 function QuickStartPage() {
+  const tracker = getComponent('delivery-tracker-card');
   return (
     <>
       <MdH1 id="quick-start">Quick start</MdH1>
@@ -395,13 +526,12 @@ function QuickStartPage() {
           </SubtitleLink>
         }
       >
-        Thirty components for running and managing AI workflows with React.
+        React components for maps and logistics.
       </Subtitle>
 
       <MdP>
-        Paper is the <em>operations</em> layer of an AI product: watching a run, inspecting a step, replaying it, forking
-        it, comparing the branch, listing every run, watching the metrics, and approving a side effect before it happens.
-        The chat layer is commodity — this is the part that today only exists inside closed observability platforms.
+        Paper is a set of finished, product-facing components where a map is the visual: a delivery tracker, a store
+        locator, a dispatch board. They are the screens you would otherwise build from scratch on top of a map library.
       </MdP>
 
       <MdP>
@@ -409,54 +539,29 @@ function QuickStartPage() {
         <Link href="https://ui.shadcn.com/" arrow>
           shadcn/ui
         </Link>{' '}
-        components, so they inherit your theme.
+        components and{' '}
+        <Link href="https://maplibre.org/" arrow>
+          MapLibre GL
+        </Link>
+        , which is open source and needs no API key.
       </MdP>
 
-      <Demo
-        code={`import { RunHeader } from '@/components/agent-ops/run-header';
-import { RunTimeline } from '@/components/agent-ops/run-timeline';
-
-export function RunPanel({ run, step, onSelectStep }) {
-  return (
-    <div className="grid gap-4">
-      <RunHeader run={run} />
-      <RunTimeline run={run} selectedStepId={step.id} onSelectStep={onSelectStep} />
-    </div>
-  );
-}`}
-        wide
-      >
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          <RunHeader run={RUN_ACTIVE} />
-          <RunTimeline run={RUN_ACTIVE} selectedStepId="s4" />
-        </div>
+      <Demo code={tracker?.usage} file="delivery-tracker-card.tsx">
+        {PREVIEWS['delivery-tracker-card']}
       </Demo>
 
-      <MdH2 id="the-shared-model">The shared model</MdH2>
-      <MdP>
-        Every component speaks the same model, so you can feed them from any orchestrator. Nothing owns your data: pass
-        a <Code>Run</Code> in, get events out.
-      </MdP>
+      <MdH2 id="how-it-works">How it works</MdH2>
       <MdUl>
         <MdLi>
-          <Code>Workflow</Code> — id, name, version and its steps.
+          Positions are <Code>[longitude, latitude]</Code> pairs, longitude first, as in GeoJSON.
         </MdLi>
-        <MdLi>
-          <Code>Run</Code> — status, trigger, totals, and the steps; optionally a <Code>parentRunId</Code> when it is a
-          fork.
-        </MdLi>
-        <MdLi>
-          <Code>RunStep</Code> — type (agent, llm, tool, human), status, duration, tokens, cost, input, output, error,
-          attempt.
-        </MdLi>
-        <MdLi>
-          <Code>RunEvent</Code> — timestamp, level (info, warn, error), type and message.
-        </MdLi>
+        <MdLi>Routes come from your own routing API (OSRM, Mapbox, Google). The components draw them; they never fetch them.</MdLi>
+        <MdLi>Components are controlled: push new data in and the map follows, get events out through callbacks.</MdLi>
       </MdUl>
 
-      <MdH2 id="see-it-assembled">See it assembled</MdH2>
+      <MdH2 id="next">Next</MdH2>
       <MdP>
-        The <Link href="#/console">Operations console</Link> page stacks them the way a real ops screen uses them.
+        Follow the <Link href="/installation">installation</Link> steps, or <Link href="/components">browse the components</Link>.
       </MdP>
     </>
   );
@@ -466,20 +571,37 @@ function InstallationPage() {
   return (
     <>
       <MdH1 id="installation">Installation</MdH1>
-      <Subtitle>How to get the components into your project.</Subtitle>
+      <Subtitle>How to get a component into your project.</Subtitle>
 
       <MdH2 id="install-the-dependencies">Install the dependencies</MdH2>
-      <MdP>Every component is plain React. Install the runtime helpers it imports — icons and the class helper.</MdP>
-      <InstallBlock packages="lucide-react clsx tailwind-merge" />
+      <MdP>Every component is plain React. Install the map engine and the helpers it imports.</MdP>
+      <InstallBlock packages="maplibre-gl lucide-react clsx tailwind-merge" />
 
       <MdH2 id="copy-the-component">Copy the component</MdH2>
       <MdP>
-        Copy the file you need from <Code>src/components/agent-ops</Code> into your project. Components compose the
-        primitives in <Code>src/components/ui</Code> (shadcn/ui) and the shared types in{' '}
-        <Code>components/agent-ops/types.ts</Code>.
+        Every map component imports one shared file, <Code>map-kit.tsx</Code>, so copy that first and only once. Then copy
+        the components you need from <Code>src/components/maps</Code>. Components compose the primitives in{' '}
+        <Code>src/components/ui</Code> (shadcn/ui), so add the ones a component lists.
       </MdP>
-      <CodeBlock file="terminal" language="bash" code={`cp src/components/agent-ops/{run-header,run-timeline,types}.tsx ./src/components/agent-ops/`} />
+      <CodeBlock
+        file="terminal"
+        language="bash"
+        code={`pnpm dlx shadcn@latest add card button badge input
+cp src/components/maps/map-kit.tsx ./src/components/maps/
+cp src/components/maps/store-locator.tsx ./src/components/maps/`}
+      />
 
+      <MdH2 id="set-up-the-map">Set up the map</MdH2>
+      <MdP>
+        <Code>map-kit.tsx</Code> holds everything MapLibre needs: the <Code>useMap</Code> hook, the <Code>MapCanvas</Code>{' '}
+        element, the <Code>MapMarker</Code> component and a few geometry helpers. It imports MapLibre&apos;s stylesheet and
+        points MapLibre at its web worker; the worker line is the Vite form, so other bundlers need their own equivalent.
+      </MdP>
+      <CodeBlock file="map-kit.tsx" code={getSource('components/maps/map-kit.tsx')} />
+      <MdP>
+        The default map style is OpenFreeMap&apos;s <Code>positron</Code>, which needs no key. Pass any MapLibre style URL
+        or object as <Code>mapStyle</Code> to use your own tiles.
+      </MdP>
       <MdH2 id="set-up-styles">Set up styles</MdH2>
       <MdP>
         The components use the standard shadcn/ui CSS variables, plus Tailwind v4. If you already run shadcn/ui, there is
@@ -513,8 +635,9 @@ function InstallationPage() {
           components available at <Code>@/components/ui</Code>.
         </MdLi>
         <MdLi>
-          <Code>lucide-react</Code> for icons.
+          <Code>maplibre-gl</Code> and <Code>lucide-react</Code>.
         </MdLi>
+        <MdLi>A network connection to a tile server. The default is OpenFreeMap.</MdLi>
       </MdUl>
     </>
   );
@@ -528,8 +651,8 @@ function StylingPage() {
 
       <MdH2 id="tokens">Tokens</MdH2>
       <MdP>
-        Everything runs on CSS variables, so a rebrand is a variable change rather than a component fork. The values below
-        are the ones the components are designed against.
+        The card, text and buttons run on shadcn/ui CSS variables, so a rebrand is a variable change rather than a
+        component fork.
       </MdP>
       <CodeBlock
         file="styles.css"
@@ -543,33 +666,24 @@ function StylingPage() {
   --border: #00000014;
   --primary: #2e2e2e;
   --primary-foreground: #ffffff;
-  --ring: #2e2e2e;
   --radius: 0.5rem;
 }`}
       />
 
-      <MdH2 id="state-without-colour">State without colour</MdH2>
+      <MdH2 id="colour-on-the-map">Colour on the map</MdH2>
       <MdP>
-        A run has six states and the palette has no hues to spare, so state is carried by shape, fill, weight and icon —
-        which is also what makes the components legible in any product’s brand.
+        Map layers are drawn on a canvas, which cannot read CSS variables. Anything painted on the map takes a plain
+        colour prop instead: <Code>routeColor</Code> for the route line and <Code>accentColor</Code> for the driver
+        marker, the active step and the ETA icon.
       </MdP>
-      <MdUl>
-        <MdLi>Queued — a hollow circle.</MdLi>
-        <MdLi>Running — a spinning arc in the ring.</MdLi>
-        <MdLi>Waiting — a half-filled circle and a half-filled bar: blocked on a human.</MdLi>
-        <MdLi>Done — a filled circle with a check.</MdLi>
-        <MdLi>Failed — a circle with an ✕, plus the error inline.</MdLi>
-        <MdLi>Skipped — a faint outline and a strikethrough.</MdLi>
-      </MdUl>
+      <CodeBlock code={`<DeliveryTrackerCard routeColor="#0f172a" accentColor="#2563eb" {...order} />`} />
 
       <MdH2 id="overriding">Overriding</MdH2>
       <MdP>
-        Every component accepts <Code>className</Code> and spreads the rest of its props onto its root element, so the
-        usual Tailwind escape hatches work.
+        Every component accepts <Code>className</Code>, merged onto its root element, so the usual Tailwind escape
+        hatches work.
       </MdP>
-      <CodeBlock
-        code={`<StepDetail step={step} className="bg-muted/40" />`}
-      />
+      <CodeBlock code={`<DeliveryTrackerCard className="w-full max-w-md" {...order} />`} />
     </>
   );
 }
@@ -578,38 +692,33 @@ function CompositionPage() {
   return (
     <>
       <MdH1 id="composition">Composition</MdH1>
-      <Subtitle>One model, ten surfaces, no data owned by any of them.</Subtitle>
+      <Subtitle>Data in, events out, and no map state owned by the component.</Subtitle>
 
       <MdH2 id="controlled">Controlled by default</MdH2>
       <MdP>
-        Selection, replay position and filters are either controlled (<Code>value</Code> + <Code>onChange</Code>) or
-        local. Nothing reaches for a context you did not provide, so two consoles can sit on one page without
-        interfering.
+        Positions, routes and the current step are props. Nothing reaches for a context you did not provide, so two maps
+        can sit on one page without interfering.
       </MdP>
       <CodeBlock
-        code={`const [step, setStep] = React.useState(run.steps[0]);
+        code={`const [position, setPosition] = React.useState(driver.position);
 
-<RunTimeline run={run} selectedStepId={step.id} onSelectStep={setStep} />
-<StepDetail step={step} onRetry={() => retry(step)} />`}
+<DeliveryTrackerCard route={route} driver={{ ...driver, position }} currentStepId={step} ... />`}
       />
 
       <MdH2 id="data-flow">Data flow</MdH2>
       <MdP>
-        The components are read-only views over data you already have. When your orchestrator emits something, pass the
-        new array in — the timeline, event stream and metrics all follow.
+        The components are read-only views over data you already have. When your backend emits a new position, put it in
+        state and the marker moves and the route re-splits.
       </MdP>
       <CodeBlock
-        code={`// your orchestrator, your store, your socket
-socket.on('run:update', (run) => store.setRun(run));
-
-// the console is just a view
-<EventStream events={run.events} />`}
+        code={`// your backend, your store, your socket
+socket.on('driver:position', (lngLat) => setPosition(lngLat));`}
       />
 
-      <MdH2 id="internal-primitives">Internal primitives</MdH2>
+      <MdH2 id="bring-your-own-routing">Bring your own routing</MdH2>
       <MdP>
-        Anything under <Code>components/internal</Code> is implementation detail, not API. The public surface is the ten
-        components; if you delete an internal helper, the compiler tells you which component needed it.
+        The route is an array of coordinates, so it can come from OSRM, Mapbox, Google or your own dispatch service. The
+        component draws it and never calls a routing API itself.
       </MdP>
     </>
   );
@@ -622,137 +731,42 @@ function TypeScriptPage() {
       <Subtitle>The types are the documentation.</Subtitle>
 
       <MdH2 id="the-model">The model</MdH2>
-      <MdP>Import the model once and every component accepts it.</MdP>
+      <MdP>The shapes below are exported from the component file. Nothing else is shared between components yet.</MdP>
       <CodeBlock
-        file="components/agent-ops/types.ts"
-        code={`export type StepType = 'agent' | 'llm' | 'tool' | 'human' | 'subworkflow';
-export type StepStatus = 'queued' | 'running' | 'done' | 'waiting' | 'failed' | 'skipped';
-export type RunStatus = 'queued' | 'running' | 'waiting' | 'paused' | 'succeeded' | 'failed' | 'cancelled';
+        file="components/maps/delivery-tracker-card.tsx"
+        code={`export type LngLat = [longitude: number, latitude: number];
 
-export interface RunStep {
-  id: string;
-  name: string;
-  type: StepType;
-  status: StepStatus;
-  durationMs?: number;
-  tokens?: number;
-  cost?: number;
-  attempt?: number;
-  input?: string;
-  output?: string;
-  error?: string;
-  meta?: string;
+export interface DeliveryStop {
+  label: string;
+  position: LngLat;
 }
 
-export interface Run {
+export interface DeliveryDriver {
+  name: string;
+  vehicle: string;
+  plate?: string;
+  rating?: number;
+  position: LngLat;
+}
+
+export interface DeliveryStep {
   id: string;
-  workflow: string;
-  workflowVersion?: string;
-  status: RunStatus;
-  trigger?: 'manual' | 'schedule' | 'webhook' | 'api';
-  startedAt?: string;
-  elapsed?: string;
-  heartbeat?: string;
-  checkpoint?: string;
-  tokens?: number;
-  cost?: number;
-  steps: RunStep[];
-  parentRunId?: string;
-  forkedFromStep?: string;
+  label: string;
 }`}
       />
 
       <MdH2 id="extending">Extending</MdH2>
       <MdP>
-        Add fields to <Code>RunStep</Code> and the components keep working: they render what they know and ignore the
-        rest. Where a component needs more, it takes a small dedicated type — for example{' '}
-        <Code>ApprovalRequest</Code> for the approval step.
+        The components are your files, so extend the types in place. Add a field to <Code>DeliveryDriver</Code>, then
+        read it in the driver row.
       </MdP>
       <CodeBlock
-        code={`import type { Run, RunStep } from '@/components/agent-ops/types';
+        code={`import type { DeliveryDriver } from '@/components/maps/delivery-tracker-card';
 
-function MyOwnTimeline({ run }: { run: Run }) {
-  return run.steps.map((step: RunStep) => step.name);
+interface MyDriver extends DeliveryDriver {
+  photoUrl: string;
 }`}
       />
-    </>
-  );
-}
-
-function ConsolePage() {
-  const [step, setStep] = React.useState(RUN_ACTIVE.steps[3]);
-  const [index, setIndex] = React.useState(3);
-  const [playing, setPlaying] = React.useState(false);
-  const [speed, setSpeed] = React.useState(1);
-  const last = RUN_PARENT.steps.length - 1;
-
-  React.useEffect(() => {
-    if (!playing) return;
-    const timer = window.setInterval(() => {
-      setIndex((current) => {
-        if (current >= last) {
-          setPlaying(false);
-          return current;
-        }
-        return current + 1;
-      });
-    }, 1400 / speed);
-    return () => window.clearInterval(timer);
-  }, [playing, speed, last]);
-
-  return (
-    <>
-      <MdH1 id="operations-console">Operations console</MdH1>
-      <Subtitle>The run surfaces on one screen, the way an ops product uses them.</Subtitle>
-
-      <MdP>
-        Watch a live run, inspect a step, read the event log, replay the whole thing, fork it from a step, compare the
-        branch, then manage the run list and its metrics. Everything below is live — click a step, scrub the replay.
-      </MdP>
-
-      <Demo wide file="agent-ops-console.tsx" code={`const [step, setStep] = React.useState(run.steps[3]);
-
-<RunHeader run={run} />
-<RunTimeline run={run} selectedStepId={step.id} onSelectStep={setStep} />
-<StepDetail step={step} onRetry={() => retry(step)} />
-<EventStream events={events} />`}>
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          <RunHeader run={RUN_ACTIVE} />
-          <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'minmax(0,1fr)' }}>
-            <RunTimeline run={RUN_ACTIVE} selectedStepId={step.id} onSelectStep={setStep} />
-            <StepDetail step={step} />
-            <EventStream events={EVENTS} />
-          </div>
-        </div>
-      </Demo>
-
-      <Demo wide file="replay-fork.tsx" code={`<ReplayScrubber run={run} index={index} onChange={setIndex} />
-<ForkPanel run={run} step={step} onFork={fork} />
-<BranchCompare parent={parent} branch={branch} />`}>
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          <ReplayScrubber
-            run={RUN_PARENT}
-            index={index}
-            onChange={setIndex}
-            playing={playing}
-            onTogglePlay={() => setPlaying((value) => !value)}
-            speed={speed}
-            onSpeedChange={setSpeed}
-          />
-          <ForkPanel run={RUN_PARENT} step={RUN_PARENT.steps[2]} />
-          <BranchCompare parent={RUN_PARENT} branch={RUN_BRANCH} />
-        </div>
-      </Demo>
-
-      <Demo wide file="approvals-metrics.tsx" code={`<ApprovalStep request={request} onApprove={approve} />
-<RunMetrics kpis={kpis} trend={trend} failures={failures} />
-<RunsTable runs={runs} onSelect={openRun} />`}>
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          <ApprovalStep request={APPROVAL_EMAIL} />
-          <RunMetrics kpis={KPIS} trend={TREND} failures={FAILURES} />
-          <RunsTable runs={RUNS} />
-        </div>
-      </Demo>
     </>
   );
 }
@@ -795,15 +809,23 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
 
       <MdH2 id="installation">Installation</MdH2>
       <MdP>
-        There is no package here — copy the file below into <Code>src/{entry.file}</Code> and it's yours to edit. It's
-        built on shadcn/ui primitives, so add those first:
+        There is no package here — copy the file below into <Code>src/{entry.file}</Code> and it's yours to edit.
+        {entry.primitives.length ? " It's built on shadcn/ui primitives, so add those first:" : ' It uses no shadcn/ui primitives.'}
       </MdP>
-      <CodeBlock file="terminal" language="bash" code={`pnpm dlx shadcn@latest add ${entry.primitives.join(' ')}`} />
+      {entry.primitives.length ? (
+        <CodeBlock file="terminal" language="bash" code={`pnpm dlx shadcn@latest add ${entry.primitives.join(' ')}`} />
+      ) : null}
       {entry.deps.length ? (
         <>
           <MdP>And the packages the file imports:</MdP>
           <InstallBlock packages={entry.deps.join(' ')} />
         </>
+      ) : null}
+      {entry.file.startsWith('components/maps/') ? (
+        <MdP>
+          It also imports the shared map helpers from <Code>src/components/maps/map-kit.tsx</Code>. Copy that file once and
+          every map component can use it; see <Link href="/installation">Installation</Link> for the map setup.
+        </MdP>
       ) : null}
 
       <MdH2 id="source">Source</MdH2>
@@ -836,11 +858,165 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
 }
 
 /* ============================================================================
+   components index
+   ========================================================================== */
+
+const PITCHES = [
+  {
+    title: 'Finished, not plumbing',
+    body: 'A delivery tracker, a store locator, a dispatch board: whole screens with a map in them, not another map wrapper.',
+    illustration: '/illustrations/project-development.svg',
+  },
+  {
+    title: 'Copy-paste, not a package',
+    body: 'No version to chase. Copy the file into your project and own it from that moment on.',
+    illustration: '/illustrations/puzzle.svg',
+  },
+  {
+    title: 'An open map stack',
+    body: 'MapLibre GL and OpenFreeMap tiles: open source, no API key, no per-load billing.',
+    illustration: '/illustrations/target-accent.svg',
+  },
+];
+
+const FEATURED_IDS = ['delivery-tracker-card', 'store-locator', 'fleet-overview', 'region-choropleth'];
+
+function ComponentCard({ id }: { id: string }) {
+  const entry = getComponent(id);
+  if (!entry) return null;
+  return (
+    <a
+      href={`/components/${entry.id}`}
+      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card no-underline transition-colors hover:border-pink/50"
+    >
+      <span className="flex aspect-[4/3] items-start justify-center overflow-hidden border-b border-border bg-muted">
+        <img src={`/screenshots/${entry.id}.png`} alt={`${entry.name} preview`} loading="lazy" className="h-full w-full object-cover object-top" />
+      </span>
+      <span className="flex flex-col gap-1 p-4">
+        <span className="text-sm font-bold text-foreground group-hover:text-pink">{entry.name}</span>
+        <span className="text-xs text-muted-foreground">{entry.tagline}</span>
+      </span>
+    </a>
+  );
+}
+
+function LandingPage() {
+  return (
+    <div className="flex flex-col gap-20 py-8 sm:py-12">
+      <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto]">
+        <div className="flex flex-col items-start gap-6">
+          <span className="flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-pink" aria-hidden />
+            {COMPONENTS.length} components
+          </span>
+
+          <h1 className="max-w-3xl text-4xl font-medium tracking-tight text-foreground sm:text-6xl">
+            React components for maps and logistics.
+          </h1>
+
+          <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
+            Delivery tracking, store locators, fleet dashboards, route planning. The finished screens you would otherwise
+            build from scratch around a map, as components you copy into your project.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Button asChild size="lg">
+              <a href="/components">Browse components</a>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <a href="/quick-start">Read the docs</a>
+            </Button>
+            <Button asChild size="lg" variant="ghost">
+              <a href={REPO} target="_blank" rel="noopener noreferrer">
+                GitHub
+              </a>
+            </Button>
+          </div>
+        </div>
+
+        <div className="hidden lg:block">{PREVIEWS['delivery-tracker-card']}</div>
+      </section>
+
+      <section className="grid grid-cols-1 gap-10 border-y border-border py-10 sm:grid-cols-3">
+        {PITCHES.map((pitch) => (
+          <div key={pitch.title} className="flex flex-col gap-3">
+            <img src={pitch.illustration} alt="" aria-hidden className="h-20 w-auto self-start" />
+            <h3 className="text-sm font-medium text-foreground">{pitch.title}</h3>
+            <p className="text-sm text-muted-foreground">{pitch.body}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="text-xl font-medium text-foreground">A few of them</h2>
+          <a href="/components" className="font-mono text-xs text-muted-foreground hover:text-pink">
+            Browse all {COMPONENTS.length} →
+          </a>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURED_IDS.map((id) => (
+            <ComponentCard key={id} id={id} />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ComponentsIndexPage() {
+  return (
+    <div className="flex flex-col gap-12 py-8 sm:py-12">
+      <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3">
+          <span className="flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-pink" aria-hidden />
+            {COMPONENTS.length} components
+          </span>
+          <h1 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Components</h1>
+          <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
+            Open one for installation, the full source and the API reference.
+          </p>
+        </div>
+        <img src="/illustrations/target-accent.svg" alt="" aria-hidden className="hidden h-24 w-auto sm:block" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {COMPONENTS.map((entry) => (
+          <ComponentCard key={entry.id} id={entry.id} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================================
+   screenshot target — bare render of one preview, used by the screenshot script
+   ========================================================================== */
+
+function ShotPage({ id }: { id: string }) {
+  const entry = getComponent(id);
+  const preview = PREVIEWS[id];
+  return (
+    <>
+      <style>{'html,body{margin:0;padding:0;background:var(--background);}'}</style>
+      {preview ? (
+        <div id="shot-root" style={{ display: 'inline-block', padding: 24, width: entry?.wide ? 1000 : 600 }}>
+          <Demo wide={entry?.wide}>{preview}</Demo>
+        </div>
+      ) : (
+        <div style={{ padding: 24 }}>Unknown component: {id}</div>
+      )}
+    </>
+  );
+}
+
+/* ============================================================================
    app
    ========================================================================== */
 
 export default function DocsApp() {
-  const route = useRoute();
+  const { route, navigate } = useRouter();
   const [searchOpen, setSearchOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -853,6 +1029,10 @@ export default function DocsApp() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  if (route.startsWith('shot/')) {
+    return <ShotPage id={route.slice('shot/'.length)} />;
+  }
 
   const componentId = route.startsWith('components/') ? route.slice('components/'.length) : null;
   const entry = componentId ? getComponent(componentId) : undefined;
@@ -873,20 +1053,21 @@ export default function DocsApp() {
       ? [
           { id: 'install-the-dependencies', label: 'Install the dependencies' },
           { id: 'copy-the-component', label: 'Copy the component' },
+          { id: 'set-up-the-map', label: 'Set up the map' },
           { id: 'set-up-styles', label: 'Set up styles' },
           { id: 'requirements', label: 'Requirements' },
         ]
       : route === 'styling'
         ? [
             { id: 'tokens', label: 'Tokens' },
-            { id: 'state-without-colour', label: 'State without colour' },
+            { id: 'colour-on-the-map', label: 'Colour on the map' },
             { id: 'overriding', label: 'Overriding' },
           ]
         : route === 'composition'
           ? [
               { id: 'controlled', label: 'Controlled by default' },
               { id: 'data-flow', label: 'Data flow' },
-              { id: 'internal-primitives', label: 'Internal primitives' },
+              { id: 'bring-your-own-routing', label: 'Bring your own routing' },
             ]
           : route === 'typescript'
             ? [
@@ -894,16 +1075,20 @@ export default function DocsApp() {
                 { id: 'extending', label: 'Extending' },
               ]
             : [
-                { id: 'the-shared-model', label: 'The shared model' },
-                { id: 'see-it-assembled', label: 'See it assembled' },
+                { id: 'how-it-works', label: 'How it works' },
+                { id: 'next', label: 'Next' },
               ];
 
-  const page = entry ? (
+  const isBare = route === '' || route === 'components';
+
+  const page = route === '' ? (
+    <LandingPage />
+  ) : entry ? (
     <ComponentPage entry={entry} route={route} />
+  ) : route === 'components' ? (
+    <ComponentsIndexPage />
   ) : route === 'installation' ? (
     <InstallationPage />
-  ) : route === 'console' ? (
-    <ConsolePage />
   ) : route === 'styling' ? (
     <StylingPage />
   ) : route === 'composition' ? (
@@ -915,20 +1100,26 @@ export default function DocsApp() {
   );
 
   return (
-    <div className="RootLayout">
+    <div className={cn('RootLayout', !isBare && 'DocsWide')}>
+      <Header route={route} onSearch={() => setSearchOpen(true)} />
       <div className="RootLayoutContainer">
         <div className="RootLayoutContent">
-          <div className="ContentLayoutRoot">
-            <Header onSearch={() => setSearchOpen(true)} />
-            <SideNav route={route} />
-            <main className="ContentLayoutMain" id="main-content">
-              <QuickNav title={entry?.name ?? 'Paper'} items={quickNav} />
-              <div className="QuickNavContent">{page}</div>
+          {isBare ? (
+            <main id="main-content" className="mx-auto w-full max-w-[80rem] px-6 pb-24 sm:px-10" style={{ paddingTop: 'var(--header-height)' }}>
+              {page}
             </main>
-          </div>
+          ) : (
+            <div className="ContentLayoutRoot">
+              <SideNav route={route} />
+              <main className="ContentLayoutMain" id="main-content">
+                <QuickNav title={entry?.name ?? 'Paper'} items={quickNav} />
+                <div className="QuickNavContent">{page}</div>
+              </main>
+            </div>
+          )}
         </div>
       </div>
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} onNavigate={(href) => (window.location.hash = href.replace(/^#/, ''))} />
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} onNavigate={navigate} />
     </div>
   );
 }

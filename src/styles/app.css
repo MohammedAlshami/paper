@@ -33,7 +33,7 @@
   ============================================================================
   Layer 2 — component tokens, shadcn/ui style.
 
-  This is what src/components/ui/* and src/components/agent-ops/* actually
+  This is what src/components/ui/* and src/components/maps/* actually
   read (--background, --primary, --border, ...). Tuned to the same palette
   the docs shell above uses, so the two layers read as one product: white
   surfaces, #2e2e2e ink, 8%-black hairlines, #f9f9f9 wells, #767676 muted
@@ -77,9 +77,13 @@
   --sidebar-accent-foreground: #2e2e2e;
   --sidebar-border: #00000014;
   --sidebar-ring: #2e2e2e;
+
+  /* The accent colour: illustrations, the driver marker, a hover tint. Never structural. */
+  --pink: #ec4899;
 }
 
 .dark {
+  --pink: #f472b6;
   --background: #0a0a0a;
   --foreground: #fafafa;
   --card: #141414;
@@ -132,6 +136,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-pink: var(--pink);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -156,4 +161,76 @@
   100% {
     transform: translateX(320%);
   }
+}
+
+/*
+  ============================================================================
+  Layer 3 — fixes for behavior the scraped Layer 1 CSS assumed JS would
+  provide. Unlayered (not @layer), so these rules win over Layer 1's
+  `@layer components` regardless of import order.
+
+  base-ui.com's real code blocks sit inside a Radix ScrollArea that sets
+  `overflow-x: auto` + a `data-has-overflow-x` attribute via JS/ResizeObserver.
+  We only copied the CSS, not that JS, so `.line { white-space: pre }` had
+  nothing to scroll inside — long lines just pushed past the card and the
+  page went horizontally scrollable. These rules give every code block its
+  own scrollbar instead.
+  ============================================================================
+*/
+.CodeBlockPreContainer,
+.CodeBlockViewport,
+.DemoSourceBrowser,
+.DemoCodeBlockViewport {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/*
+  Docs pages: the sidebar and on-page nav sit out at the window edges and the
+  article between them stays a readable width, centered in the space left over.
+  base-ui.com left-aligns this column with margin-left:0 at large sizes.
+*/
+.RootLayout.DocsWide .ContentLayoutMain {
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+/*
+  The docs pages (component pages, quick start, ...) fill the window: the whole
+  shell (header, sidebar, content, on-page nav) is centered inside
+  `--breakpoint-max-layout-width`, which base-ui.com sets to 89rem, leaving
+  ~230px of dead space each side on a 1800px window. Raising the cap and
+  tightening the side padding brings the gap close to shadcn/ui's docs.
+  Scoped to `.DocsWide` so the landing page and /components keep the original
+  centered layout.
+*/
+.RootLayout.DocsWide {
+  --breakpoint-max-layout-width: 120rem;
+}
+
+@media (min-width: 64rem) {
+  .RootLayout.DocsWide {
+    --root-layout-padding-x: 2rem;
+  }
+}
+
+/* Tailwind's preflight makes svg display:block, which drops the link arrow onto its own line. */
+.Link > svg {
+  display: inline;
+  margin-left: 0.25rem;
+}
+
+/*
+  Phones and small tablets. The header was written to sit inside the docs grid, which supplies its
+  side padding; outside it (the landing page, /components) it had none and touched the screen edge.
+*/
+@media (max-width: 63.99rem) {
+  .HeaderInner {
+    padding-inline: 1rem;
+  }
+}
+
+/* The tap target for Search is wider than its label on a phone; keep it inside the header. */
+.HeaderSearchMobileTrigger {
+  white-space: nowrap;
 }
