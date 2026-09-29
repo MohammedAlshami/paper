@@ -4,7 +4,7 @@ A city as a chip; hover it for a map.
 
 An inline chip for a place name. Hover, focus or tap it and a small popover opens with a map and the coordinates. The map is only created while the popover is open.
 
-**Category:** Location pickers and forms · **Status:** new
+**Category:** Location pickers and forms · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/location-badge.tsx` in your projec
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/location-badge.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

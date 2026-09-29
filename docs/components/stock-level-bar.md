@@ -4,7 +4,7 @@ Stock against its limits, and what is on its way.
 
 A bar per part showing what is on the shelf, the reorder line, the ceiling, and a hatched segment for what is on order. Below the reorder line it says "Reorder now", or "Low, order arriving" if an order covers it.
 
-**Category:** Parts and inventory · **Status:** new
+**Category:** Parts and inventory · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/stock-level-bar.tsx` in your proj
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/stock-level-bar.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

@@ -1,10 +1,11 @@
-# Paper — React components for maps and fleet operations
+# Paper — React components for maps, fleets and app screens
 
-Copy-paste components in three families: 30 where a map is the visual, 30 for running a fleet, and 33 app building blocks (shell, auth, data table, billing, marketing sections). Plus three full templates built only from them. Finished, product-facing screens, not another wrapper.
+Copy-paste components in three families: 30 where a map is the visual, 30 for running a fleet, and 49 app building blocks (shell, auth, data table, billing, marketing, and the list and form pieces the templates needed). Plus four full templates built only from them. Finished, product-facing screens, not another wrapper.
 
 - **Copy-paste, not a package.** No version to chase. Copy the file and own it.
 - **Built on shadcn/ui and MapLibre GL.** Cards, buttons and badges come from the primitives you already have; the map is MapLibre with OpenFreeMap tiles, which is open source and needs no API key.
 - **Real source in the docs.** Every component page shows the full file you paste, plus usage, examples and the API reference.
+- **Readable by assistants.** A public MCP server at `/mcp` lets Claude, Cursor and other agents search the components and read their source directly.
 
 Live docs: **https://paper.mshami2021.workers.dev**
 
@@ -83,12 +84,19 @@ Whole sub-projects at `/templates`, each built only from the components in this 
 | **Courier** | Last-mile delivery: public tracking and checkout, plus a dispatcher console with routes and analytics. | maps + app |
 | **Garage** | Fleet maintenance: dashboard, vehicles, work order board, scheduling, inventory, reports. | fleet + app |
 | **Ledger** | SaaS starter: landing, auth flow, dashboard, customers, billing, team, settings. | app |
+| **Harbor** | Retail back-office: 29 pages across orders, pick and pack, delivery dispatch, stock, purchasing, the van fleet, stores, customers, reports, team and settings — one shared data set that links an order to its customer, its products and the van that carried it. | maps + fleet + app |
 
 `npm run check:templates` fails if a template imports anything other than components, or uses a raw button, input or table.
+
+## Use with AI (MCP)
+
+The site is also a public MCP server at `https://paper.mshami2021.workers.dev/mcp`, so Claude, Cursor and other agents can search the components, read their source and plan a copy. It is stateless and read-only: no sign-in, no keys. The tools are `get_guidelines`, `list_components`, `search_components`, `get_component`, `get_install_plan`, `list_templates`, `get_template` and `get_source`; plain-file readers can start from [`llms.txt`](public/llms.txt). The docs page at `/mcp/doc` has the one-line setup for each client.
 
 ## App components
 
 Layout and navigation (`AppShell`, `PageHeader`, `SettingsLayout`, `CommandPalette`, `NotificationsPopover`, `EmptyState`, `StepIndicator`), authentication and account (`AuthCard`, `LoginForm`, `RegisterForm`, `ForgotPasswordForm`, `VerifyCodeForm`, `ProfileForm`, `NotificationPreferences`, `ApiKeyList`, `DangerZoneCard`), data and dashboards (`DataTable`, `StatCardGrid`, `ActivityFeed`, `RevenueChart`, `RecordDetailSheet`), billing and teams (`PricingTable`, `PlanUsageCard`, `InvoiceList`, `PaymentMethodCard`, `TeamMembers`) and marketing pages (`SiteHeader`, `HeroSection`, `FeatureGrid`, `FaqList`, `TestimonialGrid`, `CtaBanner`, `SiteFooter`). They share `app-kit.ts`.
+
+The Harbor template added the list, form and feedback pieces it needed: `FilterBar`, `DateRangePicker`, `MultiSelect`, `FileUpload`, `InlineEdit`, `BulkActionBar`, `KanbanBoard`, `Timeline`, `PageTabs`, `RosterGrid`, `ShareBarList`, `MetricLeaderboard`, `StockAdjustDialog`, `IntegrationList`, `ConfirmDialog` and a `Toast` system.
 
 ## Fleet maintenance components
 

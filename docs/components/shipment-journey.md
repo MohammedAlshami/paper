@@ -4,7 +4,7 @@ A shipment across trucks, ships and planes, leg by leg.
 
 Every leg of a multi-mode shipment on one map, drawn as arcs (dashed when upcoming, solid when done, accented when active) with a vehicle marker riding the active leg, and a timeline of legs below. Select a leg to zoom to it.
 
-**Category:** Tracking and delivery · **Status:** new
+**Category:** Tracking and delivery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/shipment-journey.tsx` in your proj
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/shipment-journey.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

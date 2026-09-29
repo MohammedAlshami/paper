@@ -4,7 +4,7 @@ Who did what, newest first, grouped by day.
 
 A list of events, each with an avatar, a sentence with the subject in bold, an optional quoted line, and the time. Events are grouped under Today, Yesterday and dates, and a Show more button reveals older ones.
 
-**Category:** Data and dashboards · **Status:** new
+**Category:** Data and dashboards · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/activity-feed.tsx` in your project.
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/activity-feed.tsx`, `src/components/app/app-kit.ts`
 
 ## Usage
 

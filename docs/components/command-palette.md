@@ -4,7 +4,7 @@ Cmd-K: search grouped commands, arrow to pick, enter to run.
 
 A search box over grouped commands with keyboard selection and keyword matching. Use it as a dialog that toggles on Cmd-K or Ctrl-K, or draw it in place with inline.
 
-**Category:** Layout and navigation · **Status:** new
+**Category:** Layout and navigation · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/command-palette.tsx` in your projec
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/command-palette.tsx`
 
 ## Usage
 

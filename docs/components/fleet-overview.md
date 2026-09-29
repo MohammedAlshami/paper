@@ -4,7 +4,7 @@ Every vehicle on one map, with counts by status.
 
 A KPI strip, a status-filtered vehicle list, and a map with a heading-aware marker per vehicle. Moving vehicles are dark, idle ones outlined, delayed ones use the accent colour, and offline ones fade. Push new positions and the markers move.
 
-**Category:** Fleet and operations · **Status:** new
+**Category:** Fleet and operations · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/fleet-overview.tsx` in your projec
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/fleet-overview.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

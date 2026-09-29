@@ -4,7 +4,7 @@ Drag a job onto a driver. Or tap it, on a phone.
 
 Unassigned jobs on one side, drivers below them, and a map of both. Drag a job onto a driver to assign it, or tap a job and then tap Assign, which is what touchscreens use. Assigned jobs appear as removable chips and as dashed lines on the map.
 
-**Category:** Fleet and operations · **Status:** new
+**Category:** Fleet and operations · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/dispatch-board.tsx` in your projec
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/dispatch-board.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

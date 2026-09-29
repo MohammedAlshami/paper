@@ -4,7 +4,7 @@ Fault codes in plain English, worst first.
 
 OBD-II codes sorted by severity, each with a plain-English meaning, its system, when it first appeared and how often. Expand a code for likely causes, and create a work order or clear it.
 
-**Category:** Vehicle health and records · **Status:** new
+**Category:** Vehicle health and records · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/diagnostic-code-list.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/diagnostic-code-list.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

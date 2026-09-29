@@ -4,7 +4,7 @@ Questions that open to their answers.
 
 A bordered list of questions built on the collapsible primitive. Opening one closes the others unless multiple is set; the plus turns to a cross. Answers can be any node, so links work.
 
-**Category:** Marketing pages · **Status:** new
+**Category:** Marketing pages · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/faq-list.tsx` in your project. Ther
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/faq-list.tsx`
 
 ## Usage
 

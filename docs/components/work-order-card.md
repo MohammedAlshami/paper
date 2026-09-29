@@ -4,7 +4,7 @@ One repair job: where it is, who has it, what it costs so far.
 
 The status as a five-step bar, priority, technician and bay, a task checklist you can tick, and parts, labour and total cost. A primary action moves the job to its next status.
 
-**Category:** Work orders and repairs · **Status:** new
+**Category:** Work orders and repairs · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/work-order-card.tsx` in your proj
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/work-order-card.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

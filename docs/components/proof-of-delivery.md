@@ -4,7 +4,7 @@ The record of a drop-off: photo, place, time, signature.
 
 A delivery confirmation: the drop-off photo, a small map with a pin where the driver confirmed it, the address, driver and note, a timestamp, and the recipient’s signature. Without a photo it shows a quiet placeholder.
 
-**Category:** Tracking and delivery · **Status:** new
+**Category:** Tracking and delivery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/proof-of-delivery.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/proof-of-delivery.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

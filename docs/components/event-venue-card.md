@@ -4,7 +4,7 @@ When and where, and where to park.
 
 An event card: a date badge, the title, time and venue, a map with the venue and each parking option, and the parking listed nearest first with price, note and the walk to the door.
 
-**Category:** Store and place discovery · **Status:** new
+**Category:** Store and place discovery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/event-venue-card.tsx` in your proj
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/event-venue-card.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

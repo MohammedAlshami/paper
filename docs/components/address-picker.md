@@ -4,7 +4,7 @@ Search for an address or drop a pin, then confirm.
 
 A search box with suggestions above a map with a draggable pin. Searching moves the pin, and dragging it or clicking the map looks up the new address. The map is a form control here, so the geocoding is yours: pass any provider.
 
-**Category:** Location pickers and forms · **Status:** new
+**Category:** Location pickers and forms · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/address-picker.tsx` in your projec
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/address-picker.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

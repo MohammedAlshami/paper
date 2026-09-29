@@ -4,7 +4,7 @@ Find the nearest one, on a map and in a list that agree with each other.
 
 A searchable, filterable list of places beside a map. Filter chips and search narrow both at once, the list sorts nearest first, and selecting a row or a pin highlights the other and opens a card with directions.
 
-**Category:** Store and place discovery · **Status:** new
+**Category:** Store and place discovery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/store-locator.tsx` in your project
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/store-locator.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

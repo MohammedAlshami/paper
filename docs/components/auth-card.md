@@ -4,7 +4,7 @@ The frame every sign-in page shares.
 
 A title, a description, your form and some small print, as one centred card or as a split page with a brand panel beside it. The panel hides on a phone, so the form is always first.
 
-**Category:** Authentication and account · **Status:** new
+**Category:** Authentication and account · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/auth-card.tsx` in your project. The
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/auth-card.tsx`
 
 ## Usage
 

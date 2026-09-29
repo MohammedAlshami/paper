@@ -4,7 +4,7 @@ Fuel card purchases, with anything odd flagged and explained.
 
 Totals for spend, litres and flagged purchases, then the purchases newest first. Flagged ones say why: more than the tank holds, the vehicle was parked, far from the route, or a possible duplicate. Mark each reviewed.
 
-**Category:** Tyres, fuel and fluids · **Status:** new
+**Category:** Tyres, fuel and fluids · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/fuel-transaction-list.tsx` in you
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/fuel-transaction-list.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

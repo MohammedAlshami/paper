@@ -4,7 +4,7 @@ Where activity is dense, for the hours you pick.
 
 A density heatmap that fades from clear to the accent colour, an hourly histogram with your range lit, and two sliders to choose the hours. The total and the busiest hour in range update as you drag.
 
-**Category:** Data visualisation · **Status:** new
+**Category:** Data visualisation · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/heatmap-card.tsx` in your project.
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/heatmap-card.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

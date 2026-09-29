@@ -4,7 +4,7 @@ Registration, insurance and inspections, and how long they have left.
 
 Every compliance document soonest first, with days left, a bar for how much of its life remains, and a filter for expired, due soon and valid. Expired ones use the accent colour; a Renew action is optional.
 
-**Category:** Vehicle health and records · **Status:** new
+**Category:** Vehicle health and records · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/document-expiry-tracker.tsx` in y
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/document-expiry-tracker.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

@@ -4,7 +4,7 @@ The headline numbers of a dashboard, one card each.
 
 A card per number with an optional icon, the change against the last period, and a trend line. A change is drawn in the accent colour only when it moved the wrong way, which you say with goodWhen. Lays out as one, two or four columns depending on the space it is given.
 
-**Category:** Data and dashboards · **Status:** new
+**Category:** Data and dashboards · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/stat-card-grid.tsx` in your project
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/stat-card-grid.tsx`
 
 ## Usage
 

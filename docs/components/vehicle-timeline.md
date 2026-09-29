@@ -4,7 +4,7 @@ A vehicle’s whole life, in order.
 
 Purchases, services, repairs, inspections, incidents and notes, newest first and grouped by year, with a running cost total. Filter by type; tap an event for its detail.
 
-**Category:** Vehicle health and records · **Status:** new
+**Category:** Vehicle health and records · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/vehicle-timeline.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/vehicle-timeline.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

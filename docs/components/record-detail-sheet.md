@@ -4,7 +4,7 @@ One record slides in from the side, so the list keeps its place.
 
 A title, a status badge, labelled fields, optional extra tabs and pinned action buttons. RecordDetail is the body, for use inline in a page or a split view; RecordDetailSheet puts the same body in a side sheet that closes on Escape or a click outside.
 
-**Category:** Data and dashboards · **Status:** new
+**Category:** Data and dashboards · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/record-detail-sheet.tsx` in your pr
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/record-detail-sheet.tsx`
 
 ## Usage
 

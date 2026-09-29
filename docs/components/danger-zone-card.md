@@ -4,7 +4,7 @@ Irreversible actions, each behind a confirmation.
 
 A card outlined in the destructive colour that lists actions such as deleting a workspace. Each opens a dialog; give an action a confirm phrase and the button stays disabled until it is typed exactly.
 
-**Category:** Authentication and account · **Status:** new
+**Category:** Authentication and account · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/danger-zone-card.tsx` in your proje
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/danger-zone-card.tsx`
 
 ## Usage
 

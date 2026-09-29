@@ -4,7 +4,7 @@ A saved card, without the digits you should not show.
 
 A drawn brand mark, the last four digits, the expiry and the holder, with a Default badge and actions to update, remove or make it the default. An expired card shows its expiry in the accent colour.
 
-**Category:** Billing and teams · **Status:** new
+**Category:** Billing and teams · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/payment-method-card.tsx` in your pr
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/payment-method-card.tsx`
 
 ## Usage
 

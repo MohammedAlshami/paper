@@ -4,7 +4,7 @@ An order to a supplier, and a way to book in the delivery.
 
 The order’s status as a five-step bar, its total and ETA, and each line with received against ordered. Type what arrived (or leave it empty for everything outstanding) and Receive; the status moves to part received or received on its own.
 
-**Category:** Parts and inventory · **Status:** new
+**Category:** Parts and inventory · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/purchase-order-card.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/purchase-order-card.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

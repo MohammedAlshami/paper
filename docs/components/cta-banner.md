@@ -4,7 +4,7 @@ The closing ask of a marketing page.
 
 A centred panel with a headline, a sentence and one or two buttons, washed with a soft accent glow from the top. Put it right above the footer.
 
-**Category:** Marketing pages · **Status:** new
+**Category:** Marketing pages · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/cta-banner.tsx` in your project. Th
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/cta-banner.tsx`
 
 ## Usage
 

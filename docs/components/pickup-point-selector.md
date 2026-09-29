@@ -4,7 +4,7 @@ Choose where to collect: lockers, stores, post offices.
 
 A map and a radio list of collection points, nearest first, with the type, hours, distance and walking time. Full points cannot be chosen. Filter by type, pick one, and confirm.
 
-**Category:** Location pickers and forms · **Status:** new
+**Category:** Location pickers and forms · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/pickup-point-selector.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/pickup-point-selector.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

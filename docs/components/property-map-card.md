@@ -4,7 +4,7 @@ Listings as price tags; pick one to see what is around it.
 
 Listings as price pills on a map. Selecting one opens its price, beds, baths and size, draws a dashed neighbourhood ring around it, and counts the other listings inside the ring.
 
-**Category:** Travel and real estate · **Status:** new
+**Category:** Travel and real estate · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/property-map-card.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/property-map-card.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

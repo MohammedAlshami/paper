@@ -4,7 +4,7 @@ A list of sections on the left, the chosen one on the right.
 
 The shape of most settings pages. Sections are listed as a vertical menu on desktop and as a row of pills on a phone, and each brings its own content, so the forms stay where you write them.
 
-**Category:** Layout and navigation · **Status:** new
+**Category:** Layout and navigation · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/settings-layout.tsx` in your projec
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/settings-layout.tsx`
 
 ## Usage
 

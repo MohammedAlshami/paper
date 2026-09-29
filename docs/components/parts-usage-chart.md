@@ -4,7 +4,7 @@ How fast parts are used up, month by month.
 
 An area chart of consumption by part with a chip per part showing its total. Tap a chip to show or hide that part. Built on Recharts.
 
-**Category:** Parts and inventory · **Status:** new
+**Category:** Parts and inventory · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/parts-usage-chart.tsx` in your pr
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/parts-usage-chart.tsx`
 
 ## Usage
 

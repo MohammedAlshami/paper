@@ -4,7 +4,7 @@ Which vehicles were working, idle or in the shop, day by day.
 
 A row per vehicle and a square per day: in use, idle, in the shop or off duty. Each row ends with its utilisation, hovering a day names it, and the first column stays put when the grid scrolls on a phone.
 
-**Category:** Fleet costs and stats · **Status:** new
+**Category:** Fleet costs and stats · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/utilization-grid.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/utilization-grid.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

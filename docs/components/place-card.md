@@ -4,7 +4,7 @@ One place: how good it is, how far it is, how to get there.
 
 A card for a single place: a photo (or a map when there is none), an open or closed badge, rating and price level, distance and walking time from the visitor, and an Open in maps button.
 
-**Category:** Store and place discovery · **Status:** new
+**Category:** Store and place discovery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/place-card.tsx` in your project. T
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/place-card.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

@@ -4,7 +4,7 @@ Set the maintenance intervals once, per vehicle class.
 
 A tab per vehicle class, with its tasks as editable rows: every N kilometres, every N months, whichever comes first. Add and remove tasks, see when there are unsaved changes, and save the whole schedule.
 
-**Category:** Maintenance scheduling · **Status:** new
+**Category:** Maintenance scheduling · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/pm-schedule-builder.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/pm-schedule-builder.tsx`
 
 ## Usage
 

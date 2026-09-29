@@ -4,7 +4,7 @@ Where someone is in a short flow.
 
 A row of numbered steps joined by a line. Finished steps show a tick and can be pressed to go back, the current step takes the accent colour, and on a phone only the current label is shown so the row always fits.
 
-**Category:** Layout and navigation · **Status:** new
+**Category:** Layout and navigation · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/step-indicator.tsx` in your project
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/step-indicator.tsx`
 
 ## Usage
 

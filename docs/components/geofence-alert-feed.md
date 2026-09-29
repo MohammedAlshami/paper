@@ -4,7 +4,7 @@ Who crossed which boundary, with a snapshot of where.
 
 A newest-first feed of vehicles entering and leaving zones. Every row carries its own tiny snapshot of the zone and where the vehicle was; selecting a row shows that event on a larger map above.
 
-**Category:** Fleet and operations · **Status:** new
+**Category:** Fleet and operations · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/geofence-alert-feed.tsx` in your p
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/geofence-alert-feed.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

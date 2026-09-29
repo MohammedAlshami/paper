@@ -4,7 +4,7 @@ Every job in its column. Drag it on, or use the menu.
 
 A kanban of work orders by status. Drag a card to another column, or use the status menu on each card, which is what touchscreens use. Columns scroll sideways on a phone and snap into place.
 
-**Category:** Work orders and repairs · **Status:** new
+**Category:** Work orders and repairs · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/work-order-board.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/work-order-board.tsx`, `src/components/fleet/fleet-kit.ts`, `src/components/fleet/work-order-card.tsx`
 
 ## Usage
 

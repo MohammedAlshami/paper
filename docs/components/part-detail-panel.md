@@ -4,7 +4,7 @@ One part: what it fits, who sells it, what it has cost, where it is.
 
 Four tabs: the vehicles the part fits, suppliers by price with a preferred one marked, the price history as a chart with the change since the first entry, and stock by location.
 
-**Category:** Parts and inventory · **Status:** new
+**Category:** Parts and inventory · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/part-detail-panel.tsx` in your pr
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/part-detail-panel.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

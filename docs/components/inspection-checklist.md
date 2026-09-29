@@ -4,7 +4,7 @@ A pre-trip walk-around: pass, fail or not applicable.
 
 Sections of items, each answered pass, fail or N/A. A fail asks what is wrong. A failed critical item shows a "do not drive" warning and marks the vehicle out of service on submit. Submit stays off until every item is answered.
 
-**Category:** Work orders and repairs · **Status:** new
+**Category:** Work orders and repairs · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/inspection-checklist.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/inspection-checklist.tsx`
 
 ## Usage
 

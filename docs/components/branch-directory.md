@@ -4,7 +4,7 @@ Offices grouped by region, with the map and the contact details.
 
 A directory of branches under region headings beside a map. Selecting a branch flies the map to it and opens its hours, a call button and an email button.
 
-**Category:** Store and place discovery · **Status:** new
+**Category:** Store and place discovery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/branch-directory.tsx` in your proj
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/branch-directory.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

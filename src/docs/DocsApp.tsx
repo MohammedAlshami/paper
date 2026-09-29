@@ -46,9 +46,10 @@ const SIDEBAR_COMPONENT_GROUPS: { heading: string; ids: string[] }[] = [
   { heading: 'Parts and inventory', ids: ['parts-inventory-table', 'stock-level-bar', 'reorder-suggestions', 'parts-usage-chart', 'part-detail-panel', 'purchase-order-card'] },
   { heading: 'Tyres, fuel and fluids', ids: ['tire-status-grid', 'fuel-economy-trend', 'fluids-battery-panel', 'fuel-transaction-list'] },
   { heading: 'Fleet costs and stats', ids: ['fleet-kpi-strip', 'cost-breakdown-chart', 'utilization-grid', 'vehicle-leaderboard', 'replacement-planner'] },
-  { heading: 'Layout and navigation', ids: ['app-shell', 'page-header', 'settings-layout', 'command-palette', 'notifications-popover', 'empty-state', 'step-indicator'] },
+  { heading: 'Layout and navigation', ids: ['app-shell', 'page-header', 'settings-layout', 'command-palette', 'notifications-popover', 'empty-state', 'step-indicator', 'page-tabs'] },
   { heading: 'Authentication and account', ids: ['auth-card', 'login-form', 'register-form', 'forgot-password-form', 'verify-code-form', 'profile-form', 'notification-preferences', 'api-key-list', 'danger-zone-card'] },
-  { heading: 'Data and dashboards', ids: ['data-table', 'stat-card-grid', 'activity-feed', 'revenue-chart', 'record-detail-sheet'] },
+  { heading: 'Data and dashboards', ids: ['data-table', 'filter-bar', 'date-range-picker', 'kanban-board', 'timeline', 'roster-grid', 'bulk-action-bar', 'stat-card-grid', 'activity-feed', 'revenue-chart', 'record-detail-sheet', 'share-bar-list', 'metric-leaderboard'] },
+  { heading: 'Forms and feedback', ids: ['multi-select', 'file-upload', 'confirm-dialog', 'toast', 'inline-edit', 'stock-adjust-dialog'] },
   { heading: 'Billing and teams', ids: ['pricing-table', 'plan-usage-card', 'invoice-list', 'payment-method-card', 'team-members'] },
   { heading: 'Marketing pages', ids: ['site-header', 'hero-section', 'feature-grid', 'faq-list', 'testimonial-grid', 'cta-banner', 'site-footer'] },
 ];
@@ -69,6 +70,7 @@ const NAV: NavGroup[] = [
       { id: 'installation', label: 'Installation', href: '/installation' },
       { id: 'components', label: 'All components', href: '/components' },
       { id: 'templates', label: 'Templates', href: '/templates' },
+      { id: 'mcp', label: 'Use with AI (MCP)', href: '/mcp/doc' },
     ],
   },
   {
@@ -597,13 +599,14 @@ function QuickStartPage() {
           </SubtitleLink>
         }
       >
-        React components for maps and fleet operations.
+        React components for maps, fleets and the apps around them.
       </Subtitle>
 
       <MdP>
-        Paper is a set of finished, product-facing components for running a fleet. Some put a map front and centre (a
-        delivery tracker, a store locator, a dispatch board); the rest cover the workshop and the office (work orders,
-        service schedules, parts, fuel, running costs). They are the screens you would otherwise build from scratch.
+        Paper is a set of finished, product-facing components for delivery, fleet and back-office work. Some put a map
+        front and centre (a delivery tracker, a store locator, a dispatch board); the rest cover the workshop (work
+        orders, service schedules, parts, fuel, running costs) and the app around it (shells, auth, tables, billing,
+        settings). They are the screens you would otherwise build from scratch.
       </MdP>
 
       <MdP>
@@ -682,6 +685,10 @@ cp src/components/maps/store-locator.tsx ./src/components/maps/`}
         <Code>src/components/app</Code>. Copy it once. They use a few more shadcn/ui primitives: avatar, checkbox, dialog,
         dropdown-menu, select, sheet, switch and popover. The <Link href="/templates">templates</Link> are built only from these
         components, so a template folder needs the components its pages list.
+      </MdP>
+      <MdP>
+        The whole library is also readable by AI assistants over MCP — see{' '}
+        <Link href="/mcp/doc">Use with AI (MCP)</Link>.
       </MdP>
 
       <MdH2 id="set-up-the-map">Set up the map</MdH2>
@@ -1021,12 +1028,14 @@ function LandingPage() {
           </span>
 
           <h1 className="max-w-3xl text-4xl font-medium tracking-tight text-foreground sm:text-6xl">
-            React components for maps and fleet operations.
+            React components for maps, fleets and back-office apps.
           </h1>
 
           <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Delivery tracking and store locators on a map, and the fleet side too: maintenance schedules, work orders,
-            parts inventory, running costs. Finished screens you copy into your project, and three full templates that show how they fit together.
+            Delivery tracking and store locators on a map; the fleet side too — maintenance schedules, work orders,
+            parts inventory, running costs; and the app pieces — shells, auth, tables, billing, settings. Finished screens
+            you copy into your project, and four full templates, from a delivery platform to a retailer&apos;s back-office,
+            that show how they fit together.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -1121,6 +1130,90 @@ function ComponentsIndexPage() {
         ))}
       </div>
     </div>
+  );
+}
+
+/* ============================================================================
+   MCP — the library as a tool for Claude and other agents
+   ========================================================================== */
+
+const MCP_URL = 'https://paper.mshami2021.workers.dev/mcp';
+
+const MCP_TOOLS: { name: string; does: string }[] = [
+  { name: 'get_guidelines', does: 'How the library works: the stack, the design theme and the composition rules. Read first.' },
+  { name: 'search_components', does: 'Find components by what you need, such as "kanban board" or "invoice table".' },
+  { name: 'list_components', does: 'Every component, filterable by family (maps, fleet, app) or category.' },
+  { name: 'get_component', does: 'One component as markdown: usage, examples, the API table and the full source.' },
+  { name: 'get_install_plan', does: 'The shadcn primitives, npm packages and every file to copy for a set of components.' },
+  { name: 'get_source', does: 'Any file by path: a component, a shared kit, a ui primitive or a template file.' },
+  { name: 'list_templates', does: 'The templates, with their pages and live links.' },
+  { name: 'get_template', does: 'One template: its pages, the components each page uses and its files.' },
+];
+
+function McpPage() {
+  return (
+    <>
+      <MdH1 id="use-with-ai">Use with AI</MdH1>
+      <Subtitle>Connect Claude, Cursor or any MCP client, so an assistant can find, read and copy these components itself.</Subtitle>
+
+      <MdH2 id="server">The server</MdH2>
+      <MdP>
+        Paper is a remote MCP server over streamable HTTP. It is public and read-only, so there is no sign-in and no key. Every
+        tool reads the same registry and source files as this site.
+      </MdP>
+      <CodeBlock file="url" language="bash" code={MCP_URL} />
+
+      <MdH2 id="claude">Claude</MdH2>
+      <MdP>
+        In Claude, open Settings, then Connectors, choose <Code>Add custom connector</Code>, paste the URL above and connect.
+        There is nothing to authorise.
+      </MdP>
+
+      <MdH2 id="claude-code">Claude Code</MdH2>
+      <CodeBlock file="terminal" language="bash" code={`claude mcp add --transport http paper ${MCP_URL}`} />
+
+      <MdH2 id="other-clients">Cursor and other clients</MdH2>
+      <MdP>Any client that supports remote servers takes the URL in its config.</MdP>
+      <CodeBlock
+        file="mcp.json"
+        language="json"
+        code={`{
+  "mcpServers": {
+    "paper": {
+      "url": "${MCP_URL}"
+    }
+  }
+}`}
+      />
+      <MdP>
+        A client that only speaks stdio can bridge with <Code>npx mcp-remote {MCP_URL}</Code>.
+      </MdP>
+
+      <MdH2 id="tools">Tools</MdH2>
+      <MdUl>
+        {MCP_TOOLS.map((tool) => (
+          <MdLi key={tool.name}>
+            <Code>{tool.name}</Code>: {tool.does}
+          </MdLi>
+        ))}
+      </MdUl>
+
+      <MdH2 id="try-it">Try it</MdH2>
+      <MdP>Once connected, ask for something in plain words:</MdP>
+      <MdUl>
+        <MdLi>&quot;Add a work order board and a data table to my app, using Paper.&quot;</MdLi>
+        <MdLi>&quot;Build a settings page from Paper components: profile form and notification preferences.&quot;</MdLi>
+        <MdLi>&quot;Which Paper components would I use for a vehicle detail page? Give me the install plan.&quot;</MdLi>
+        <MdLi>&quot;Start from the Garage template and swap the demo data for my own.&quot;</MdLi>
+      </MdUl>
+
+      <MdH2 id="for-other-agents">For other agents</MdH2>
+      <MdP>
+        Agents that read plain files can start from <Link href={`${MCP_URL.replace(/\/mcp$/, "")}/llms.txt`} arrow>llms.txt</Link>, which links every component and template as
+        markdown, or from <Link href={`${MCP_URL.replace(/\/mcp$/, "")}/mcp-data/guidelines.md`} arrow>the design guidelines</Link>. Each component is at{' '}
+        <Code>/mcp-data/components/&lt;id&gt;.md</Code>.
+      </MdP>
+    </>
   );
 }
 
@@ -1340,7 +1433,17 @@ export default function DocsApp() {
           })),
         },
       ]
-    : route === 'installation'
+    : route === 'mcp/doc'
+      ? [
+          { id: 'server', label: 'The server' },
+          { id: 'claude', label: 'Claude' },
+          { id: 'claude-code', label: 'Claude Code' },
+          { id: 'other-clients', label: 'Cursor and others' },
+          { id: 'tools', label: 'Tools' },
+          { id: 'try-it', label: 'Try it' },
+          { id: 'for-other-agents', label: 'For other agents' },
+        ]
+      : route === 'installation'
       ? [
           { id: 'install-the-dependencies', label: 'Install the dependencies' },
           { id: 'copy-the-component', label: 'Copy the component' },
@@ -1384,6 +1487,8 @@ export default function DocsApp() {
     <TemplatesIndexPage />
   ) : route.startsWith('templates/') ? (
     <TemplateDetailPage id={route.slice('templates/'.length)} />
+  ) : route === 'mcp/doc' ? (
+    <McpPage />
   ) : route === 'installation' ? (
     <InstallationPage />
   ) : route === 'styling' ? (

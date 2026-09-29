@@ -4,7 +4,7 @@ The top bar of a marketing page, with a menu on phones.
 
 The brand, a row of links, and up to two actions. Below the md breakpoint the links and actions move into a sheet opened by a menu button. Pass onNavigate to route the links yourself.
 
-**Category:** Marketing pages · **Status:** new
+**Category:** Marketing pages · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/site-header.tsx` in your project. T
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/site-header.tsx`
 
 ## Usage
 

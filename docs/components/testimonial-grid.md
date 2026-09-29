@@ -4,7 +4,7 @@ Customer quotes in a calm grid.
 
 A heading over a grid of quote cards, each with the person, their role and company. One column on a phone, two on a tablet, three on a desktop.
 
-**Category:** Marketing pages · **Status:** new
+**Category:** Marketing pages · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/testimonial-grid.tsx` in your proje
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/testimonial-grid.tsx`, `src/components/app/app-kit.ts`
 
 ## Usage
 

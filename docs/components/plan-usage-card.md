@@ -4,7 +4,7 @@ The plan you are on and how much of it you have used.
 
 The plan name and price, the renewal date, and a meter for each limit: seats, storage, requests. A meter at 85% or more turns to the accent colour. Two buttons at the foot: manage billing and upgrade.
 
-**Category:** Billing and teams · **Status:** new
+**Category:** Billing and teams · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/plan-usage-card.tsx` in your projec
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/plan-usage-card.tsx`, `src/components/app/app-kit.ts`
 
 ## Usage
 

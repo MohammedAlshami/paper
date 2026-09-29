@@ -4,7 +4,7 @@ How long to work from here? Drop a pin and see.
 
 Drive-time bands drawn around a workplace, and a home pin you can search for, drag or click into place. The answer reads as a range, like 10 to 20 min, or says when the pin is outside every band. The bands come from your routing service; the component draws them.
 
-**Category:** Travel and real estate · **Status:** new
+**Category:** Travel and real estate · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/commute-calculator.tsx` in your pr
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/commute-calculator.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

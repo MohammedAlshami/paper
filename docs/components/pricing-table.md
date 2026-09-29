@@ -4,7 +4,7 @@ Plans side by side, with a monthly and yearly toggle.
 
 A row of plan cards under a billing toggle. The price follows the toggle, the featured plan is outlined in the accent colour with a badge, and a plan with no price shows a custom label such as "Let's talk".
 
-**Category:** Billing and teams · **Status:** new
+**Category:** Billing and teams · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/pricing-table.tsx` in your project.
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/pricing-table.tsx`, `src/components/app/app-kit.ts`
 
 ## Usage
 

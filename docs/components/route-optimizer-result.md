@@ -4,7 +4,7 @@ The route as booked against the route after optimising.
 
 Both routes on one map (as booked in grey and dashed, optimised in the accent colour), a Before, After or Both toggle that also renumbers the stops, and a table of distance and drive time with what was saved.
 
-**Category:** Fleet and operations · **Status:** new
+**Category:** Fleet and operations · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/route-optimizer-result.tsx` in you
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/route-optimizer-result.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

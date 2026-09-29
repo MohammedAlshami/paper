@@ -4,7 +4,7 @@ One order as a list row, with its route on a thumbnail.
 
 A compact row for order lists: a small map with the route drawn on it, where the order is going, a status badge and a line of detail. Each thumbnail only builds its map when it is near the screen, so a long list stays light.
 
-**Category:** Tracking and delivery · **Status:** new
+**Category:** Tracking and delivery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/order-route-mini.tsx` in your proj
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/order-route-mini.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

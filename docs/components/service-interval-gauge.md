@@ -4,7 +4,7 @@ How far through each service interval a vehicle is.
 
 One bar per interval (oil, tyre rotation, brakes, filters) showing how much of it is used, with the distance left or over and when it was last done. The most used interval is at the top.
 
-**Category:** Maintenance scheduling · **Status:** new
+**Category:** Maintenance scheduling · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/service-interval-gauge.tsx` in yo
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/service-interval-gauge.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

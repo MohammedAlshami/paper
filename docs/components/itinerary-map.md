@@ -4,7 +4,7 @@ A trip day by day, with the stops, the route and the list in step.
 
 Day tabs, a numbered stop list with times and notes, and a map with the day’s route and numbered markers. Selecting a stop in either place highlights it in both and centres the map on it.
 
-**Category:** Travel and real estate · **Status:** new
+**Category:** Travel and real estate · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/itinerary-map.tsx` in your project
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/itinerary-map.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

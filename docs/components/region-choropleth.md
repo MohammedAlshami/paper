@@ -4,7 +4,7 @@ Regions shaded by a number, and ranked beside the map.
 
 A map of regions coloured along a scale by one metric, with a legend and a ranked list. Hovering a region or a list row highlights both. You bring the boundaries (any GeoJSON) and the numbers; the map is a picture of the data, so panning and zooming are off.
 
-**Category:** Data visualisation · **Status:** new
+**Category:** Data visualisation · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/region-choropleth.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/region-choropleth.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

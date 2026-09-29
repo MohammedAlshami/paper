@@ -4,7 +4,7 @@ Who is on the team, their role, and a way to invite more.
 
 A member list with avatar, name, email, a role select and an actions menu, plus an Invite dialog with an email field and a role. Pending invites carry an Invited badge. Your own row cannot be demoted or removed.
 
-**Category:** Billing and teams · **Status:** new
+**Category:** Billing and teams · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/team-members.tsx` in your project. 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/team-members.tsx`, `src/components/app/app-kit.ts`
 
 ## Usage
 

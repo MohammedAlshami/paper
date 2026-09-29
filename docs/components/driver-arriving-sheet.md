@@ -4,7 +4,7 @@ The ride-share moment: the car closing in, and who is in it.
 
 A map with the driver approaching your pickup, and a bottom sheet with the ETA, a PIN to read out, the driver, the car and its plate, and message, call and cancel actions.
 
-**Category:** Tracking and delivery · **Status:** new
+**Category:** Tracking and delivery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/driver-arriving-sheet.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/driver-arriving-sheet.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

@@ -4,7 +4,7 @@ How many vehicles will be off the road, day by day.
 
 A stacked bar chart of vehicles out of service each day, split by scheduled service, repair and inspection, the lowest availability in the window, and the list of vehicles that account for it.
 
-**Category:** Maintenance scheduling · **Status:** new
+**Category:** Maintenance scheduling · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/downtime-forecast.tsx` in your pr
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/downtime-forecast.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

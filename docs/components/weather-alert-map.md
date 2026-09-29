@@ -4,7 +4,7 @@ The regions under a storm, a flood or a closure.
 
 Alert areas shaded by severity (warning, watch, advisory), a severity legend that filters the map, and a list of active alerts with their time windows. Selecting an alert outlines it and zooms to it.
 
-**Category:** Travel and real estate · **Status:** new
+**Category:** Travel and real estate · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/weather-alert-map.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/weather-alert-map.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

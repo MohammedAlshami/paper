@@ -4,7 +4,7 @@ Where a network reaches, and how well.
 
 Coverage areas around each site, shaded by signal strength, with site markers you can select and a legend that filters the map by strength and shows how many sites there are of each.
 
-**Category:** Data visualisation · **Status:** new
+**Category:** Data visualisation · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/coverage-map.tsx` in your project.
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/coverage-map.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

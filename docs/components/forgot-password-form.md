@@ -4,7 +4,7 @@ Ask for an email, then say the link is on its way.
 
 One field, then a confirmation that does not reveal whether the address has an account. It swaps to the confirmation when onSubmit resolves; if it throws, the message is shown and the form stays.
 
-**Category:** Authentication and account · **Status:** new
+**Category:** Authentication and account · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/forgot-password-form.tsx` in your p
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/forgot-password-form.tsx`
 
 ## Usage
 

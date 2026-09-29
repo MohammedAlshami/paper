@@ -48,7 +48,7 @@ export const APP_LAYOUT_COMPONENTS: ComponentEntry[] = [
         description: 'Fills its parent. Below the md breakpoint the sidebar is a drawer opened from the top bar.',
         rows: [
           row('brand', '{ name; logo? }', 'The name and an optional logo node. Without a logo a small accent square is drawn.'),
-          row('nav', 'NavGroup[]', 'Groups of { id, label, icon?, href?, badge? } items; a group may have a heading.'),
+          row('nav', 'NavGroup[]', 'Groups of { id, label, icon?, href?, badge? } items; a group may have a heading, and with `collapsible` the heading folds it away (`defaultCollapsed` starts it folded unless it holds the active item).'),
           row('activeId', 'string', 'The id of the current item.'),
           row('onNavigate', '(item: NavItem) => void', 'Called on a click; also closes the drawer on a phone.'),
           row('user', '{ name; email?; avatarUrl? }', 'Shown at the foot of the sidebar.'),

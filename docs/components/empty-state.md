@@ -4,7 +4,7 @@ Nothing here yet: say so, and offer the next step.
 
 An icon, a title, a line of explanation and up to two actions, in a dashed panel. For a first-run list or a search with no results.
 
-**Category:** Layout and navigation · **Status:** new
+**Category:** Layout and navigation · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/empty-state.tsx` in your project. T
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/empty-state.tsx`
 
 ## Usage
 

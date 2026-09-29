@@ -4,7 +4,7 @@ A recorded trip you can scrub and play back.
 
 The route with a vehicle marker, a clock, a speed readout, and a scrubber with playback at 1×, 2×, 4× and 8×. Stops appear as flags and as ticks on the timeline, and the vehicle waits at each one for as long as it did in real life.
 
-**Category:** Data visualisation · **Status:** new
+**Category:** Data visualisation · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/trip-replay.tsx` in your project. 
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/trip-replay.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

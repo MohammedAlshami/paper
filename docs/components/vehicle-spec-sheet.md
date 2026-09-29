@@ -4,7 +4,7 @@ The facts about a vehicle, grouped so they can be found.
 
 Identity, powertrain, capacity and compliance details in labelled groups. Rows marked copyable, like the VIN and plate, are set in mono with a copy button that appears on hover.
 
-**Category:** Vehicle health and records · **Status:** new
+**Category:** Vehicle health and records · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/vehicle-spec-sheet.tsx` in your p
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/vehicle-spec-sheet.tsx`
 
 ## Usage
 

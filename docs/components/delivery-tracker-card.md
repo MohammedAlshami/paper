@@ -4,7 +4,7 @@ Where the order is, who has it, and when it arrives.
 
 A live map with the store, the driver and the destination; the route split into what has been travelled and what is left; an ETA; a step bar; and the driver with message and call actions.
 
-**Category:** Tracking and delivery · **Status:** new
+**Category:** Tracking and delivery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/delivery-tracker-card.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/delivery-tracker-card.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

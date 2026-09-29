@@ -4,7 +4,7 @@ A list you can search, filter, sort, select from and page through.
 
 Generic over your row type. Describe the columns once and get a search box, filter chips, sortable headers, page-size and paging, optional row selection with a bulk-action bar, a loading skeleton and an empty state. Columns can hide below a breakpoint, and the table scrolls sideways when it must.
 
-**Category:** Data and dashboards · **Status:** new
+**Category:** Data and dashboards · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/data-table.tsx` in your project. Th
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/data-table.tsx`
 
 ## Usage
 

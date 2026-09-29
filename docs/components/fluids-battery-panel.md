@@ -4,7 +4,7 @@ The small things that strand a vehicle.
 
 Oil life, coolant, brake and washer fluid as bars with notes, and the battery’s voltage, health, cold-crank amps and last test. Anything low is in the accent colour, and a weak battery says to plan a replacement.
 
-**Category:** Tyres, fuel and fluids · **Status:** new
+**Category:** Tyres, fuel and fluids · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/fluids-battery-panel.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/fluids-battery-panel.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

@@ -4,7 +4,7 @@ What is due or overdue across the fleet, most urgent first.
 
 Services due by distance, by date, or both, sorted by how close each is to its limit. Each row says how many kilometres or days are left (or over) and offers a Schedule action. Filter by overdue, due soon and upcoming.
 
-**Category:** Maintenance scheduling · **Status:** new
+**Category:** Maintenance scheduling · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/service-due-list.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/service-due-list.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

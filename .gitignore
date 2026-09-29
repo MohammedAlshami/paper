@@ -3,3 +3,6 @@ dist
 .DS_Store
 *.log
 .wrangler
+public/mcp-data
+public/llms.txt
+.mcp-tmp

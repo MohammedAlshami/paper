@@ -4,7 +4,7 @@ The first screen of a page: a headline, two actions, a visual.
 
 An optional eyebrow pill, a headline, a sentence of copy and two buttons, then a bordered frame for any visual and a quiet strip of customer names. Centred or left-aligned.
 
-**Category:** Marketing pages · **Status:** new
+**Category:** Marketing pages · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -16,6 +16,8 @@ Copy the file below into `src/components/app/hero-section.tsx` in your project. 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/hero-section.tsx`
 
 ## Usage
 

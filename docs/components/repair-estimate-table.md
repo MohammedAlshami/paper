@@ -4,7 +4,7 @@ A shop’s estimate, line by line: approve or decline each.
 
 Parts and labour lines, each with approve and decline buttons, recommended extras declined by default, and a running total with tax on parts. Declined lines are struck through and the savings shown.
 
-**Category:** Work orders and repairs · **Status:** new
+**Category:** Work orders and repairs · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/repair-estimate-table.tsx` in you
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/repair-estimate-table.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

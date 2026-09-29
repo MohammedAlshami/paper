@@ -4,7 +4,7 @@ A month of booked services. Pick a day to see the bays.
 
 A month grid with each day’s booked vehicles, today marked, and month navigation. On a phone the cells show dots instead of names. Pick a day to list its services with the bay and status.
 
-**Category:** Maintenance scheduling · **Status:** new
+**Category:** Maintenance scheduling · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/maintenance-calendar.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/maintenance-calendar.tsx`
 
 ## Usage
 

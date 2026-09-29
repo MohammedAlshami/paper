@@ -4,7 +4,7 @@ A number over time, with range tabs and the change against before.
 
 A total for the chosen range, its change against the range before it, and a chart underneath. 7, 30 and 90 days draw an area of daily values; 12 months draws bars of monthly totals. Give it daily points, including a full extra period behind the range, and it does the rest.
 
-**Category:** Data and dashboards · **Status:** new
+**Category:** Data and dashboards · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/revenue-chart.tsx` in your project.
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/revenue-chart.tsx`, `src/components/app/app-kit.ts`
 
 ## Usage
 

@@ -4,7 +4,7 @@ What each vehicle costs to run, split by kind.
 
 A stacked bar per vehicle for fuel, maintenance, tyres and insurance, ranked with the costliest first, with a switch between total and per kilometre and chips to hide a category. Built on Recharts.
 
-**Category:** Fleet costs and stats · **Status:** new
+**Category:** Fleet costs and stats · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/cost-breakdown-chart.tsx` in your
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/cost-breakdown-chart.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

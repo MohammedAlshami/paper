@@ -4,7 +4,7 @@ How a driver reports a problem, in under a minute.
 
 Pick the vehicle, tap what is affected, say how serious it is, describe it, and add a photo (which opens the camera on a phone). It validates before sending and tells the workshop straight away.
 
-**Category:** Work orders and repairs · **Status:** new
+**Category:** Work orders and repairs · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/defect-report-form.tsx` in your p
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/defect-report-form.tsx`
 
 ## Usage
 

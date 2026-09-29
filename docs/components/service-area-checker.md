@@ -4,7 +4,7 @@ Do we deliver to you? Type an address, get a yes or a no.
 
 A search box above a map with your service zones drawn on it and a draggable pin. The pin turns to the accent colour inside a zone, and a status line answers with the zone’s ETA and fee, or says how far the nearest zone edge is.
 
-**Category:** Location pickers and forms · **Status:** new
+**Category:** Location pickers and forms · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/service-area-checker.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/service-area-checker.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

@@ -4,7 +4,7 @@ A one-time code in boxes that behave.
 
 Separate digit boxes: typing advances, backspace steps back, the arrow keys move, and pasting a code fills them all. onComplete fires on the last digit. Resend is locked behind a countdown.
 
-**Category:** Authentication and account · **Status:** new
+**Category:** Authentication and account · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/verify-code-form.tsx` in your proje
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/verify-code-form.tsx`
 
 ## Usage
 

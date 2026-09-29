@@ -4,7 +4,7 @@ What is close, nearest first, with the walk.
 
 Places sorted by how far they are from a point, each with its distance, a walking-time chip and an open or closed marker. There is no map: it is the list on its own, for a sheet, a sidebar or a search result.
 
-**Category:** Store and place discovery · **Status:** new
+**Category:** Store and place discovery · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/nearby-list.tsx` in your project. 
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/nearby-list.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

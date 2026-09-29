@@ -4,7 +4,7 @@ When does it stop making sense to keep it?
 
 Cost per year owned across the vehicle’s life, the year it is lowest, and where it is now. Slide to a planned replacement year to see the cost per year, how much more than the best year that is, and the resale value. Built on Recharts.
 
-**Category:** Fleet costs and stats · **Status:** new
+**Category:** Fleet costs and stats · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/replacement-planner.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/replacement-planner.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

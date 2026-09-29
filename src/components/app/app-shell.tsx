@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronsUpDown, Menu, PanelLeft } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown, Menu, PanelLeft } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +23,10 @@ export interface NavItem {
 export interface NavGroup {
   heading?: string;
   items: NavItem[];
+  /** Lets the heading fold the group away. Needs a heading; ignored in the icon-only sidebar. */
+  collapsible?: boolean;
+  /** With `collapsible`, start folded. A group holding the active item always starts open. */
+  defaultCollapsed?: boolean;
 }
 
 export interface ShellUser {
@@ -138,6 +142,9 @@ function SidebarBody({
   onPick: (item: NavItem) => void;
   accentColor: string;
 }) {
+  const [folded, setFolded] = React.useState<Record<string, boolean>>(() =>
+    Object.fromEntries(nav.filter((group) => group.collapsible && group.heading && group.defaultCollapsed && !group.items.some((item) => item.id === activeId)).map((group) => [group.heading as string, true])),
+  );
   return (
     <div className="flex h-full flex-col">
       <div className={cn('flex h-14 shrink-0 items-center gap-2 border-b px-4', compact && 'justify-center px-0')}>
@@ -148,8 +155,22 @@ function SidebarBody({
       <nav className="flex-1 space-y-4 overflow-y-auto p-2" aria-label="Main">
         {nav.map((group, index) => (
           <div key={group.heading ?? index}>
-            {group.heading && !compact ? <p className="px-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{group.heading}</p> : null}
-            <ul className="space-y-0.5">
+            {group.heading && !compact ? (
+              group.collapsible ? (
+                <button
+                  type="button"
+                  aria-expanded={!folded[group.heading]}
+                  onClick={() => setFolded((current) => ({ ...current, [group.heading as string]: !current[group.heading as string] }))}
+                  className="flex w-full items-center justify-between rounded-md px-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+                >
+                  {group.heading}
+                  <ChevronDown className={cn('size-3 transition-transform', folded[group.heading] && '-rotate-90')} />
+                </button>
+              ) : (
+                <p className="px-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{group.heading}</p>
+              )
+            ) : null}
+            <ul className={cn('space-y-0.5', group.collapsible && group.heading && !compact && folded[group.heading] && 'hidden')}>
               {group.items.map((item) => {
                 const active = item.id === activeId;
                 const Icon = item.icon;

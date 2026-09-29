@@ -4,7 +4,7 @@ One vehicle’s fuel economy against the fleet.
 
 A vehicle picker, three numbers (average, difference from the fleet, the last three months against the first three), and a line chart of the vehicle against the fleet average. It says whether each is better or worse for the direction you set.
 
-**Category:** Tyres, fuel and fluids · **Status:** new
+**Category:** Tyres, fuel and fluids · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/fuel-economy-trend.tsx` in your p
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/fuel-economy-trend.tsx`
 
 ## Usage
 

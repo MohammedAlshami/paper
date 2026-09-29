@@ -4,7 +4,7 @@ Every part in stock: search, filter, sort, low stock flagged.
 
 A table of parts with search across SKU, name and bin, category chips, a low-stock-only toggle and sortable columns. Parts at or under their minimum show their count in the accent colour. Columns drop away on a phone.
 
-**Category:** Parts and inventory · **Status:** new
+**Category:** Parts and inventory · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/parts-inventory-table.tsx` in you
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/parts-inventory-table.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

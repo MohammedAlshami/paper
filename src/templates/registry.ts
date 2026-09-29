@@ -1,5 +1,6 @@
 import { COURIER_PAGES } from './courier/pages';
 import { GARAGE_PAGES } from './garage/pages';
+import { HARBOR_PAGES } from './harbor/pages';
 import { LEDGER_PAGES } from './ledger/pages';
 import type { TemplateEntry } from './types';
 
@@ -37,6 +38,16 @@ export const TEMPLATES: TemplateEntry[] = [
     families: ['app'],
     pages: LEDGER_PAGES,
     load: () => import('./ledger'),
+  },
+  {
+    id: 'harbor',
+    name: 'Harbor',
+    tagline: 'A retailer back-office: orders, delivery, stock, the van fleet and the numbers, in one app.',
+    description:
+      'The biggest template, and the one that uses all three families at once. A retailer with stores, a warehouse and its own delivery vans runs the day from here: orders are picked, packed and delivered, stock is reordered, vans are serviced. One shared data set links an order to its customer, its products and the van that carried it. There is no landing page and no sign-up, only the app.',
+    families: ['maps', 'fleet', 'app'],
+    pages: HARBOR_PAGES,
+    load: () => import('./harbor'),
   },
 ];
 

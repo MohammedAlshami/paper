@@ -4,7 +4,7 @@ Parts that hit their reorder point, ready to order in one go.
 
 Parts at or below their minimum with a suggested quantity you can nudge up or down, the supplier and lead time, and a running total. Tick what to order; creating orders groups the lines by supplier.
 
-**Category:** Parts and inventory · **Status:** new
+**Category:** Parts and inventory · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/reorder-suggestions.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/reorder-suggestions.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

@@ -4,7 +4,7 @@ A sign-up form that tells you how strong the password is.
 
 Name, work email and a password with a four-step strength meter, plus a terms box. extraFields adds your own inputs, such as a company name. Creating the account is yours.
 
-**Category:** Authentication and account · **Status:** new
+**Category:** Authentication and account · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/register-form.tsx` in your project.
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/register-form.tsx`
 
 ## Usage
 

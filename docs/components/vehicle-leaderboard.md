@@ -4,7 +4,7 @@ Rank the fleet, so the vehicle costing you money is obvious.
 
 Vehicles ranked worst first by cost per kilometre, downtime or fuel use, each with a bar and a fleet-average marker. The worst few are in the accent colour. Switch the ranking with the tabs.
 
-**Category:** Fleet costs and stats · **Status:** new
+**Category:** Fleet costs and stats · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/vehicle-leaderboard.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/vehicle-leaderboard.tsx`
 
 ## Usage
 

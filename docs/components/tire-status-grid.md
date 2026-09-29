@@ -4,7 +4,7 @@ Every tyre where it sits, with tread, pressure and age.
 
 Tyres laid out by axle, left and right, each with tread depth and a bar, pressure, and a status of OK, watch or replace. Tap one for its detail. Works for two axles or three, and for dual wheels.
 
-**Category:** Tyres, fuel and fluids · **Status:** new
+**Category:** Tyres, fuel and fluids · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/tire-status-grid.tsx` in your pro
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/tire-status-grid.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 

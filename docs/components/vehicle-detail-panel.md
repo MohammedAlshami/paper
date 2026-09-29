@@ -4,7 +4,7 @@ One vehicle: speed, fuel, driver, and where it has been.
 
 The panel you open from a fleet map: a status badge, speed, a fuel gauge that turns to the accent colour when low, the odometer, the driver with a call button, today’s trail on a mini map, and the stops it has made.
 
-**Category:** Fleet and operations · **Status:** new
+**Category:** Fleet and operations · **Family:** maps · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/maps/vehicle-detail-panel.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports the shared map helpers from `src/components/maps/map-kit.tsx`. Copy that file once; every map component uses it. MapLibre needs a web worker set up in your bundler, which `map-kit.tsx` does for Vite (`?worker&url`).
+
+Files to copy: `src/components/maps/vehicle-detail-panel.tsx`, `src/components/maps/map-kit.tsx`
 
 ## Usage
 

@@ -4,7 +4,7 @@ The numbers a fleet manager checks first.
 
 A strip of figures (availability, cost per kilometre, open work orders, average age), each with its change, coloured only when the change is the wrong way, and a trend line. Two across on a phone, four across on a desktop.
 
-**Category:** Fleet costs and stats · **Status:** new
+**Category:** Fleet costs and stats · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/fleet-kpi-strip.tsx` in your proj
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/fleet-kpi-strip.tsx`
 
 ## Usage
 

@@ -4,7 +4,7 @@ The top of a page: crumbs, title, status, actions.
 
 Breadcrumbs above a title that has room for a status badge, a line of description, and a row of action buttons that drops under the title on a phone.
 
-**Category:** Layout and navigation · **Status:** new
+**Category:** Layout and navigation · **Family:** app · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/app/page-header.tsx` in your project. T
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/app/app-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/app/page-header.tsx`
 
 ## Usage
 

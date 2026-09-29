@@ -4,7 +4,7 @@ One vehicle at a glance: a score, what is wrong, what is next.
 
 A health ring from 0 to 100, the plate and odometer, a list of open issues by severity, and the next booked service with schedule and open actions. Under 60 the ring turns to the accent colour.
 
-**Category:** Vehicle health and records · **Status:** new
+**Category:** Vehicle health and records · **Family:** fleet · **Status:** new
 
 ## Installation
 
@@ -18,6 +18,8 @@ Copy the file below into `src/components/fleet/vehicle-health-card.tsx` in your 
 version to track — you own this file from the moment you paste it.
 
 This component imports shared helpers from `src/components/fleet/fleet-kit.ts`. Copy that file once next to it.
+
+Files to copy: `src/components/fleet/vehicle-health-card.tsx`, `src/components/fleet/fleet-kit.ts`
 
 ## Usage
 
