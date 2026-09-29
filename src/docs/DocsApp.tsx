@@ -22,6 +22,8 @@ import {
 } from './md';
 import { COMPONENTS, getComponent, type ComponentEntry } from './registry';
 import { loadSource, localImportFiles } from './source';
+import { getTemplate, TEMPLATES } from '@/templates/registry';
+import type { TemplateEntry, TemplateProps } from '@/templates/types';
 
 /* ============================================================================
    navigation
@@ -44,14 +46,18 @@ const SIDEBAR_COMPONENT_GROUPS: { heading: string; ids: string[] }[] = [
   { heading: 'Parts and inventory', ids: ['parts-inventory-table', 'stock-level-bar', 'reorder-suggestions', 'parts-usage-chart', 'part-detail-panel', 'purchase-order-card'] },
   { heading: 'Tyres, fuel and fluids', ids: ['tire-status-grid', 'fuel-economy-trend', 'fluids-battery-panel', 'fuel-transaction-list'] },
   { heading: 'Fleet costs and stats', ids: ['fleet-kpi-strip', 'cost-breakdown-chart', 'utilization-grid', 'vehicle-leaderboard', 'replacement-planner'] },
+  { heading: 'Layout and navigation', ids: ['app-shell', 'page-header', 'settings-layout', 'command-palette', 'notifications-popover', 'empty-state', 'step-indicator'] },
+  { heading: 'Authentication and account', ids: ['auth-card', 'login-form', 'register-form', 'forgot-password-form', 'verify-code-form', 'profile-form', 'notification-preferences', 'api-key-list', 'danger-zone-card'] },
+  { heading: 'Data and dashboards', ids: ['data-table', 'stat-card-grid', 'activity-feed', 'revenue-chart', 'record-detail-sheet'] },
+  { heading: 'Billing and teams', ids: ['pricing-table', 'plan-usage-card', 'invoice-list', 'payment-method-card', 'team-members'] },
+  { heading: 'Marketing pages', ids: ['site-header', 'hero-section', 'feature-grid', 'faq-list', 'testimonial-grid', 'cta-banner', 'site-footer'] },
 ];
 
 const COMPONENT_NAV_GROUPS: NavGroup[] = SIDEBAR_COMPONENT_GROUPS.map(({ heading, ids }) => ({
   heading,
-  items: ids.map((id) => {
+  items: ids.flatMap((id) => {
     const entry = COMPONENTS.find((component) => component.id === id);
-    if (!entry) throw new Error(`Sidebar group "${heading}" references unknown component id "${id}"`);
-    return { id: entry.id, label: entry.name, href: `/components/${entry.id}` };
+    return entry ? [{ id: entry.id, label: entry.name, href: `/components/${entry.id}` }] : [];
   }),
 }));
 
@@ -62,6 +68,7 @@ const NAV: NavGroup[] = [
       { id: 'quick-start', label: 'Quick start', href: '/quick-start' },
       { id: 'installation', label: 'Installation', href: '/installation' },
       { id: 'components', label: 'All components', href: '/components' },
+      { id: 'templates', label: 'Templates', href: '/templates' },
     ],
   },
   {
@@ -81,13 +88,14 @@ const REPO = 'https://github.com/MohammedAlshami/paper';
  * The live previews pull in MapLibre or Recharts plus every component, so they load on demand, one chunk per
  * family: the docs shell and the components grid never pay for them, and a fleet page never downloads MapLibre.
  */
-type Family = 'maps' | 'fleet';
+type Family = 'maps' | 'fleet' | 'app';
 type PreviewModule = { PREVIEWS: Record<string, React.ReactNode>; EXAMPLES: Record<string, { label: string; node: React.ReactNode }[]> };
 const previewCache: Partial<Record<Family, PreviewModule>> = {};
 
-const familyOf = (file: string): Family => (file.startsWith('components/fleet/') ? 'fleet' : 'maps');
+const familyOf = (file: string): Family => (file.startsWith('components/fleet/') ? 'fleet' : file.startsWith('components/app/') ? 'app' : 'maps');
 
 function loadPreviews(family: Family): Promise<PreviewModule> {
+  if (family === 'app') return import('./previews-app').then((loaded) => ({ PREVIEWS: loaded.APP_PREVIEWS, EXAMPLES: loaded.APP_EXAMPLES }));
   return family === 'fleet'
     ? import('./previews-fleet').then((loaded) => ({ PREVIEWS: loaded.FLEET_PREVIEWS, EXAMPLES: loaded.FLEET_EXAMPLES }))
     : import('./previews').then((loaded) => ({ PREVIEWS: loaded.PREVIEWS, EXAMPLES: loaded.EXAMPLES }));
@@ -224,6 +232,7 @@ function GitHubMark({ className }: { className?: string }) {
 const HEADER_LINKS = [
   { label: 'Quick start', href: '/quick-start' },
   { label: 'Components', href: '/components' },
+  { label: 'Templates', href: '/templates' },
 ];
 
 function MobileMenu({ route }: { route: string }) {
@@ -667,6 +676,14 @@ cp src/components/maps/store-locator.tsx ./src/components/maps/`}
       </MdP>
       <InstallBlock packages="recharts lucide-react clsx tailwind-merge" />
 
+      <MdH2 id="app-components">App components and templates</MdH2>
+      <MdP>
+        The app components (shell, auth forms, data table, billing, marketing sections) share <Code>app-kit.ts</Code> in{' '}
+        <Code>src/components/app</Code>. Copy it once. They use a few more shadcn/ui primitives: avatar, checkbox, dialog,
+        dropdown-menu, select, sheet, switch and popover. The <Link href="/templates">templates</Link> are built only from these
+        components, so a template folder needs the components its pages list.
+      </MdP>
+
       <MdH2 id="set-up-the-map">Set up the map</MdH2>
       <MdP>
         <Code>map-kit.tsx</Code> holds everything MapLibre needs: the <Code>useMap</Code> hook, the <Code>MapCanvas</Code>{' '}
@@ -1009,7 +1026,7 @@ function LandingPage() {
 
           <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
             Delivery tracking and store locators on a map, and the fleet side too: maintenance schedules, work orders,
-            parts inventory, running costs. Finished screens you copy into your project.
+            parts inventory, running costs. Finished screens you copy into your project, and three full templates that show how they fit together.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -1058,9 +1075,9 @@ function LandingPage() {
 }
 
 function ComponentsIndexPage() {
-  const [family, setFamily] = React.useState<'all' | 'maps' | 'fleet'>('all');
+  const [family, setFamily] = React.useState<'all' | 'maps' | 'fleet' | 'app'>('all');
   const shown = COMPONENTS.filter((entry) => family === 'all' || entry.file.startsWith(`components/${family}/`));
-  const counts = { all: COMPONENTS.length, maps: COMPONENTS.filter((entry) => entry.file.startsWith('components/maps/')).length, fleet: COMPONENTS.filter((entry) => entry.file.startsWith('components/fleet/')).length };
+  const counts = { all: COMPONENTS.length, maps: COMPONENTS.filter((entry) => entry.file.startsWith('components/maps/')).length, fleet: COMPONENTS.filter((entry) => entry.file.startsWith('components/fleet/')).length, app: COMPONENTS.filter((entry) => entry.file.startsWith('components/app/')).length };
   return (
     <div className="flex flex-col gap-12 py-8 sm:py-12">
       <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
@@ -1083,6 +1100,7 @@ function ComponentsIndexPage() {
             { id: 'all', label: 'All' },
             { id: 'maps', label: 'Maps' },
             { id: 'fleet', label: 'Fleet maintenance' },
+            { id: 'app', label: 'App building blocks' },
           ] as const
         ).map((chip) => (
           <button
@@ -1103,6 +1121,157 @@ function ComponentsIndexPage() {
         ))}
       </div>
     </div>
+  );
+}
+
+/* ============================================================================
+   templates — sub-projects built only from the components above
+   ========================================================================== */
+
+function TemplateCard({ template }: { template: TemplateEntry }) {
+  const componentIds = new Set(template.pages.flatMap((page) => page.components));
+  return (
+    <a
+      href={`/templates/${template.id}`}
+      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card no-underline transition-colors hover:border-pink/50"
+    >
+      <span className="flex aspect-[16/10] items-start justify-center overflow-hidden border-b border-border bg-muted">
+        <img src={`/screenshots/templates/${template.id}.png`} alt={`${template.name} template preview`} loading="lazy" className="h-full w-full object-cover object-top" />
+      </span>
+      <span className="flex flex-col gap-2 p-5">
+        <span className="flex items-center justify-between gap-3">
+          <span className="text-base font-bold text-foreground group-hover:text-pink">{template.name}</span>
+          <span className="font-mono text-xs text-muted-foreground">
+            {template.pages.length} pages · {componentIds.size} components
+          </span>
+        </span>
+        <span className="text-sm text-muted-foreground">{template.tagline}</span>
+      </span>
+    </a>
+  );
+}
+
+function TemplatesIndexPage() {
+  return (
+    <div className="flex flex-col gap-12 py-8 sm:py-12">
+      <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3">
+          <span className="flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
+            <span className="size-1.5 rounded-full bg-pink" aria-hidden />
+            {TEMPLATES.length} templates
+          </span>
+          <h1 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Templates</h1>
+          <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
+            Whole projects, not single screens. Each one is built only from the components in this library, so you can see how
+            they fit together and copy the folder as a starting point.
+          </p>
+        </div>
+        <img src="/illustrations/target-accent.svg" alt="" aria-hidden className="hidden h-24 w-auto sm:block" />
+      </div>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {TEMPLATES.map((template) => (
+          <TemplateCard key={template.id} template={template} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TemplateDetailPage({ id }: { id: string }) {
+  const template = getTemplate(id);
+  if (!template) return <div className="py-16 text-sm text-muted-foreground">Unknown template: {id}</div>;
+  const componentIds = Array.from(new Set(template.pages.flatMap((page) => page.components)));
+  return (
+    <div className="flex flex-col gap-12 py-8 sm:py-12">
+      <div className="flex flex-col gap-4">
+        <a href="/templates" className="text-sm text-muted-foreground no-underline hover:text-foreground">
+          ← All templates
+        </a>
+        <h1 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl">{template.name}</h1>
+        <p className="max-w-2xl text-base text-muted-foreground">{template.description}</p>
+        <div className="flex flex-wrap items-center gap-3 pt-1">
+          <Button asChild size="lg">
+            <a href={`/t/${template.id}`}>Open the live template</a>
+          </Button>
+          <span className="font-mono text-xs text-muted-foreground">
+            {template.pages.length} pages · {componentIds.length} components · src/templates/{template.id}
+          </span>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
+        <div className="flex items-center gap-2 border-b border-border bg-muted px-4 py-2.5">
+          <span className="size-2.5 rounded-full bg-border" aria-hidden />
+          <span className="size-2.5 rounded-full bg-border" aria-hidden />
+          <span className="size-2.5 rounded-full bg-border" aria-hidden />
+          <span className="ml-3 truncate font-mono text-xs text-muted-foreground">/t/{template.id}</span>
+        </div>
+        <iframe src={`/t/${template.id}`} title={`${template.name} live preview`} loading="lazy" className="block h-[34rem] w-full border-0 sm:h-[46rem]" />
+      </div>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xl font-medium tracking-tight text-foreground">Pages</h2>
+        <div className="overflow-hidden rounded-lg border border-border">
+          {template.pages.map((page) => (
+            <div key={page.path} className="grid grid-cols-1 gap-3 border-b border-border p-4 last:border-b-0 md:grid-cols-[14rem_1fr_1fr]">
+              <div className="flex flex-col gap-1">
+                <a href={`/t/${template.id}${page.example ?? page.path}`} className="text-sm font-bold text-foreground no-underline hover:text-pink">
+                  {page.label}
+                </a>
+                <code className="font-mono text-xs text-muted-foreground">{page.path}</code>
+              </div>
+              <p className="text-sm text-muted-foreground">{page.description}</p>
+              <p className="flex flex-wrap gap-x-2 gap-y-1 text-sm">
+                {page.components.map((componentId) => {
+                  const entry = getComponent(componentId);
+                  return entry ? (
+                    <a key={componentId} href={`/components/${componentId}`} className="font-mono text-xs text-foreground/80 underline decoration-border underline-offset-4 hover:text-pink">
+                      {entry.name}
+                    </a>
+                  ) : null;
+                })}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-xl font-medium tracking-tight text-foreground">Use it</h2>
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          The template is a folder, <Code>src/templates/{template.id}</Code>, with one file per page and its own demo data. Every piece of
+          interface in it comes from <Code>src/components</Code>, so copy the components each page lists, then the folder, and replace the
+          demo data with your own.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+const templateComponents: Record<string, React.LazyExoticComponent<React.ComponentType<TemplateProps>>> = {};
+
+/** Runs a template full-bleed, at /t/<id>/<path>. Only a small pill leads back to the docs. */
+function TemplateRunner({ id, path, navigate }: { id: string; path: string; navigate: (href: string) => void }) {
+  const template = getTemplate(id);
+  const embedded = typeof window !== 'undefined' && window.self !== window.top;
+  if (!template) return <div className="p-8 text-sm text-muted-foreground">Unknown template: {id}</div>;
+  const Template = (templateComponents[id] ??= React.lazy(template.load));
+  const base = `/t/${id}`;
+  return (
+    <>
+      <React.Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground" role="status">Loading {template.name}</div>}>
+        <Template path={path || '/'} base={base} navigate={(to) => navigate(`${base}${to === '/' ? '' : to}`)} />
+      </React.Suspense>
+      {embedded ? null : (
+        <a
+          href={`/templates/${id}`}
+          className="fixed bottom-3 right-3 z-[60] hidden items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground no-underline opacity-80 transition-opacity hover:border-pink/50 hover:text-foreground hover:opacity-100 md:flex"
+        >
+          <span className="size-1.5 rounded-full bg-pink" aria-hidden />
+          {template.name} · Paper templates
+        </a>
+      )}
+    </>
   );
 }
 
@@ -1151,6 +1320,11 @@ export default function DocsApp() {
     return <ShotPage id={route.slice('shot/'.length)} />;
   }
 
+  if (route.startsWith('t/')) {
+    const [, id, ...rest] = route.split('/');
+    return <TemplateRunner id={id} path={`/${rest.join('/')}`} navigate={navigate} />;
+  }
+
   const componentId = route.startsWith('components/') ? route.slice('components/'.length) : null;
   const entry = componentId ? getComponent(componentId) : undefined;
 
@@ -1171,6 +1345,7 @@ export default function DocsApp() {
           { id: 'install-the-dependencies', label: 'Install the dependencies' },
           { id: 'copy-the-component', label: 'Copy the component' },
           { id: 'fleet-components', label: 'Fleet components' },
+          { id: 'app-components', label: 'App components' },
           { id: 'set-up-the-map', label: 'Set up the map' },
           { id: 'set-up-styles', label: 'Set up styles' },
           { id: 'requirements', label: 'Requirements' },
@@ -1197,7 +1372,7 @@ export default function DocsApp() {
                 { id: 'next', label: 'Next' },
               ];
 
-  const isBare = route === '' || route === 'components';
+  const isBare = route === '' || route === 'components' || route === 'templates' || route.startsWith('templates/');
 
   const page = route === '' ? (
     <LandingPage />
@@ -1205,6 +1380,10 @@ export default function DocsApp() {
     <ComponentPage entry={entry} route={route} />
   ) : route === 'components' ? (
     <ComponentsIndexPage />
+  ) : route === 'templates' ? (
+    <TemplatesIndexPage />
+  ) : route.startsWith('templates/') ? (
+    <TemplateDetailPage id={route.slice('templates/'.length)} />
   ) : route === 'installation' ? (
     <InstallationPage />
   ) : route === 'styling' ? (

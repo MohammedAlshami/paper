@@ -7,7 +7,8 @@
     "dev": "vite dev --port 3100",
     "build": "vite build",
     "preview": "vite preview --port 3100",
-    "deploy": "vite build && wrangler deploy"
+    "deploy": "vite build && wrangler deploy",
+    "check:templates": "node scripts/check-templates.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

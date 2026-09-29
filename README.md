@@ -1,6 +1,6 @@
 # Paper — React components for maps and fleet operations
 
-Copy-paste components in two families: 30 where a map is the visual (delivery tracking, store locators, route planning) and 30 for running a fleet (vehicle health, maintenance scheduling, work orders, parts inventory, tyres and fuel, costs). Finished, product-facing screens, not another wrapper.
+Copy-paste components in three families: 30 where a map is the visual, 30 for running a fleet, and 33 app building blocks (shell, auth, data table, billing, marketing sections). Plus three full templates built only from them. Finished, product-facing screens, not another wrapper.
 
 - **Copy-paste, not a package.** No version to chase. Copy the file and own it.
 - **Built on shadcn/ui and MapLibre GL.** Cards, buttons and badges come from the primitives you already have; the map is MapLibre with OpenFreeMap tiles, which is open source and needs no API key.
@@ -73,6 +73,22 @@ Built (all 30 from the plan):
 | `WeatherAlertMap` | The regions under a storm, a flood or a closure. |
 
 The original list of ideas is in [`docs/maps-component-ideas.md`](docs/maps-component-ideas.md). Each component also has a plain markdown doc under [`docs/components/`](docs/components).
+
+## Templates
+
+Whole sub-projects at `/templates`, each built only from the components in this library. Run live at `/t/<name>`, source in `src/templates/<name>`.
+
+| Template | What it is | Uses |
+| --- | --- | --- |
+| **Courier** | Last-mile delivery: public tracking and checkout, plus a dispatcher console with routes and analytics. | maps + app |
+| **Garage** | Fleet maintenance: dashboard, vehicles, work order board, scheduling, inventory, reports. | fleet + app |
+| **Ledger** | SaaS starter: landing, auth flow, dashboard, customers, billing, team, settings. | app |
+
+`npm run check:templates` fails if a template imports anything other than components, or uses a raw button, input or table.
+
+## App components
+
+Layout and navigation (`AppShell`, `PageHeader`, `SettingsLayout`, `CommandPalette`, `NotificationsPopover`, `EmptyState`, `StepIndicator`), authentication and account (`AuthCard`, `LoginForm`, `RegisterForm`, `ForgotPasswordForm`, `VerifyCodeForm`, `ProfileForm`, `NotificationPreferences`, `ApiKeyList`, `DangerZoneCard`), data and dashboards (`DataTable`, `StatCardGrid`, `ActivityFeed`, `RevenueChart`, `RecordDetailSheet`), billing and teams (`PricingTable`, `PlanUsageCard`, `InvoiceList`, `PaymentMethodCard`, `TeamMembers`) and marketing pages (`SiteHeader`, `HeroSection`, `FeatureGrid`, `FaqList`, `TestimonialGrid`, `CtaBanner`, `SiteFooter`). They share `app-kit.ts`.
 
 ## Fleet maintenance components
 

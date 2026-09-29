@@ -114,7 +114,7 @@ export function WorkOrderBoard({
 
   return (
     <Card className={cn('gap-0 overflow-hidden py-0', className)}>
-      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto p-3 @container">
+      <div className="flex snap-x snap-mandatory gap-3 relative overflow-x-auto p-3 @container">
         {WORK_ORDER_STATUSES.map((column) => {
           const cards = items.filter((item) => item.status === column.id);
           const over = overColumn === column.id;

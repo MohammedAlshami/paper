@@ -114,7 +114,7 @@ The shapes this component reads.
 'use client';
 
 import * as React from 'react';
-import { Car, Clock, House, MessageCircle, Phone, Star, Store } from 'lucide-react';
+import { Car, CircleCheck, Clock, House, MessageCircle, Phone, Star, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -177,6 +177,7 @@ export function DeliveryTrackerCard({
   route: LngLat[];
   steps: DeliveryStep[];
   currentStepId: string;
+  /** Minutes until arrival. Zero or less shows "Delivered". */
   etaMinutes: number;
   onCall?: () => void;
   onMessage?: () => void;
@@ -224,8 +225,8 @@ export function DeliveryTrackerCard({
       <div className="relative h-72 bg-muted">
         <MapCanvas containerRef={containerRef} />
         <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-background px-3 py-1.5 text-xs font-medium shadow-sm ring-1 ring-border">
-          <Clock className="size-3.5" style={{ color: accentColor }} />
-          Arriving in {etaMinutes} min
+          {etaMinutes > 0 ? <Clock className="size-3.5" style={{ color: accentColor }} /> : <CircleCheck className="size-3.5" style={{ color: accentColor }} />}
+          {etaMinutes > 0 ? `Arriving in ${etaMinutes} min` : 'Delivered'}
         </div>
       </div>
 
