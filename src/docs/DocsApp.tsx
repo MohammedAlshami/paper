@@ -21,6 +21,8 @@ import {
   SubtitleLink,
 } from './md';
 import { COMPONENTS, getComponent, type ComponentEntry } from './registry';
+import { ComponentCard } from './component-card';
+import { LandingPage } from './landing';
 import { loadSource, localImportFiles } from './source';
 import { getTemplate, TEMPLATES } from '@/templates/registry';
 import type { TemplateEntry, TemplateProps } from '@/templates/types';
@@ -301,9 +303,24 @@ function MobileMenu({ route }: { route: string }) {
 }
 
 function Header({ route, onSearch }: { route: string; onSearch: () => void }) {
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <header className="Header">
-      <div className="HeaderInner">
+      <div
+        className={cn(
+          'HeaderInner transition-all duration-300 ease-out',
+          scrolled &&
+            'top-2.5 mx-auto h-14 max-w-[calc(100%-1.5rem)] rounded-full border border-border bg-background/95 shadow-sm backdrop-blur-md lg:max-w-4xl',
+        )}
+      >
         <a className="SkipNav" href="#main-content">
           Skip to contents
         </a>
@@ -977,112 +994,6 @@ function ComponentPage({ entry, route }: { entry: ComponentEntry; route: string 
    components index
    ========================================================================== */
 
-const PITCHES = [
-  {
-    title: 'Finished, not plumbing',
-    body: 'A delivery tracker, a work order board, a parts inventory: whole screens for a real workflow, not another set of primitives.',
-    illustration: '/illustrations/project-development.svg',
-  },
-  {
-    title: 'Copy-paste, not a package',
-    body: 'No version to chase. Copy the file into your project and own it from that moment on.',
-    illustration: '/illustrations/puzzle.svg',
-  },
-  {
-    title: 'Open by default',
-    body: 'MapLibre GL and OpenFreeMap for the maps, Recharts for the charts: open source, no API keys, no per-load billing.',
-    illustration: '/illustrations/target-accent.svg',
-  },
-];
-
-const FEATURED_IDS = ['delivery-tracker-card', 'work-order-board', 'fleet-overview', 'cost-breakdown-chart'];
-
-function ComponentCard({ id }: { id: string }) {
-  const entry = getComponent(id);
-  if (!entry) return null;
-  return (
-    <a
-      href={`/components/${entry.id}`}
-      className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card no-underline transition-colors hover:border-pink/50"
-    >
-      <span className="flex aspect-[4/3] items-start justify-center overflow-hidden border-b border-border bg-muted">
-        <img src={`/screenshots/${entry.id}.png`} alt={`${entry.name} preview`} loading="lazy" className="h-full w-full object-cover object-top" />
-      </span>
-      <span className="flex flex-col gap-1 p-4">
-        <span className="text-sm font-bold text-foreground group-hover:text-pink">{entry.name}</span>
-        <span className="text-xs text-muted-foreground">{entry.tagline}</span>
-      </span>
-    </a>
-  );
-}
-
-function LandingPage() {
-  const previews = usePreviews();
-  return (
-    <div className="flex flex-col gap-20 py-8 sm:py-12">
-      <section className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1fr_auto]">
-        <div className="flex flex-col items-start gap-6">
-          <span className="flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-pink" aria-hidden />
-            {COMPONENTS.length} components
-          </span>
-
-          <h1 className="max-w-3xl text-4xl font-medium tracking-tight text-foreground sm:text-6xl">
-            React components for maps, fleets and back-office apps.
-          </h1>
-
-          <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-            Delivery tracking and store locators on a map; the fleet side too — maintenance schedules, work orders,
-            parts inventory, running costs; and the app pieces — shells, auth, tables, billing, settings. Finished screens
-            you copy into your project, and four full templates, from a delivery platform to a retailer&apos;s back-office,
-            that show how they fit together.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Button asChild size="lg">
-              <a href="/components">Browse components</a>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <a href="/quick-start">Read the docs</a>
-            </Button>
-            <Button asChild size="lg" variant="ghost">
-              <a href={REPO} target="_blank" rel="noopener noreferrer">
-                GitHub
-              </a>
-            </Button>
-          </div>
-        </div>
-
-        <div className="hidden min-h-[36rem] w-[26rem] lg:block">{previews ? previews.PREVIEWS['delivery-tracker-card'] : null}</div>
-      </section>
-
-      <section className="grid grid-cols-1 gap-10 border-y border-border py-10 sm:grid-cols-3">
-        {PITCHES.map((pitch) => (
-          <div key={pitch.title} className="flex flex-col gap-3">
-            <img src={pitch.illustration} alt="" aria-hidden className="h-20 w-auto self-start" />
-            <h3 className="text-sm font-medium text-foreground">{pitch.title}</h3>
-            <p className="text-sm text-muted-foreground">{pitch.body}</p>
-          </div>
-        ))}
-      </section>
-
-      <section className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="text-xl font-medium text-foreground">A few of them</h2>
-          <a href="/components" className="font-mono text-xs text-muted-foreground hover:text-pink">
-            Browse all {COMPONENTS.length} →
-          </a>
-        </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURED_IDS.map((id) => (
-            <ComponentCard key={id} id={id} />
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}
-
 function ComponentsIndexPage() {
   const [family, setFamily] = React.useState<'all' | 'maps' | 'fleet' | 'app'>('all');
   const shown = COMPONENTS.filter((entry) => family === 'all' || entry.file.startsWith(`components/${family}/`));
@@ -1091,10 +1002,6 @@ function ComponentsIndexPage() {
     <div className="flex flex-col gap-12 py-8 sm:py-12">
       <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
         <div className="flex flex-col gap-3">
-          <span className="flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-pink" aria-hidden />
-            {COMPONENTS.length} components
-          </span>
           <h1 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Components</h1>
           <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
             Open one for installation, the full source and the API reference.
@@ -1249,10 +1156,6 @@ function TemplatesIndexPage() {
     <div className="flex flex-col gap-12 py-8 sm:py-12">
       <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
         <div className="flex flex-col gap-3">
-          <span className="flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-pink" aria-hidden />
-            {TEMPLATES.length} templates
-          </span>
           <h1 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Templates</h1>
           <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
             Whole projects, not single screens. Each one is built only from the components in this library, so you can see how
@@ -1304,21 +1207,36 @@ function TemplateDetailPage({ id }: { id: string }) {
 
       <section className="flex flex-col gap-4">
         <h2 className="text-xl font-medium tracking-tight text-foreground">Pages</h2>
-        <div className="overflow-hidden rounded-lg border border-border">
+        <div className="overflow-hidden rounded-xl border border-border">
+          <div className="hidden grid-cols-[14rem_1fr_1fr] gap-4 border-b border-border bg-muted/60 px-5 py-3 font-mono text-[10px] uppercase tracking-wider text-muted-foreground md:grid">
+            <span>Page</span>
+            <span>What it does</span>
+            <span>Built from</span>
+          </div>
           {template.pages.map((page) => (
-            <div key={page.path} className="grid grid-cols-1 gap-3 border-b border-border p-4 last:border-b-0 md:grid-cols-[14rem_1fr_1fr]">
-              <div className="flex flex-col gap-1">
-                <a href={`/t/${template.id}${page.example ?? page.path}`} className="text-sm font-bold text-foreground no-underline hover:text-pink">
+            <div
+              key={page.path}
+              className="grid grid-cols-1 gap-4 border-b border-border px-5 py-5 transition-colors last:border-b-0 hover:bg-muted/40 md:grid-cols-[14rem_1fr_1fr]"
+            >
+              <div className="flex flex-col gap-1.5">
+                <a
+                  href={`/t/${template.id}${page.example ?? page.path}`}
+                  className="text-sm font-semibold text-foreground no-underline transition-colors hover:text-pink"
+                >
                   {page.label}
                 </a>
-                <code className="font-mono text-xs text-muted-foreground">{page.path}</code>
+                <code className="font-mono text-xs text-muted-foreground/70">{page.path}</code>
               </div>
-              <p className="text-sm text-muted-foreground">{page.description}</p>
-              <p className="flex flex-wrap gap-x-2 gap-y-1 text-sm">
+              <p className="text-sm leading-relaxed text-muted-foreground">{page.description}</p>
+              <p className="flex flex-wrap content-start gap-1.5">
                 {page.components.map((componentId) => {
                   const entry = getComponent(componentId);
                   return entry ? (
-                    <a key={componentId} href={`/components/${componentId}`} className="font-mono text-xs text-foreground/80 underline decoration-border underline-offset-4 hover:text-pink">
+                    <a
+                      key={componentId}
+                      href={`/components/${componentId}`}
+                      className="rounded-full border border-border px-2.5 py-1 font-mono text-[11px] text-muted-foreground no-underline transition-colors hover:border-pink/40 hover:text-pink"
+                    >
                       {entry.name}
                     </a>
                   ) : null;
@@ -1507,7 +1425,7 @@ export default function DocsApp() {
       <div className="RootLayoutContainer">
         <div className="RootLayoutContent">
           {isBare ? (
-            <main id="main-content" className="mx-auto w-full max-w-[80rem] px-6 pb-24 sm:px-10" style={{ paddingTop: 'var(--header-height)' }}>
+            <main id="main-content" className="mx-auto w-full px-4 pb-24 lg:px-0" style={{ paddingTop: 'var(--header-height)' }}>
               {page}
             </main>
           ) : (

@@ -143,8 +143,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --font-sans: 'die grotesk a', system-ui, sans-serif;
-  --font-sans-b: 'die grotesk b', system-ui, sans-serif;
+  --font-sans: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --font-sans-b: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
   --font-mono: 'Paper Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
@@ -160,6 +160,44 @@
   }
   100% {
     transform: translateX(320%);
+  }
+}
+
+/*
+  Landing hero: the one accented word draws its own underline on hover.
+*/
+.hero-word {
+  position: relative;
+  display: inline-block;
+  color: var(--pink);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-word::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: -0.04em;
+  height: 0.05em;
+  border-radius: 999px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-word:hover {
+  transform: translateY(-0.06em);
+}
+
+.hero-word:hover::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word,
+  .hero-word::after {
+    transition: none;
   }
 }
 
